@@ -1,0 +1,8 @@
+pipelines:
+  - name: Sanity_Trigger
+    steps:
+    - name: trigger
+      type: Bash
+      execution:
+        onExecute: 
+          - echo 'hi'
