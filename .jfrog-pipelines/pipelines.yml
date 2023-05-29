@@ -3,6 +3,33 @@ pipelines:
     steps:
     - name: trigger
       type: Bash
+      configuration:
+        outputResources:
+          - name: trigger_basic
       execution:
-        onExecute: 
-          - echo 'hi'
+        onStart: 
+          - write_output trigger_basic "triggerRunId=${run_id}"
+          - write_output trigger_basic "qualityGateStep=basic_sanity_gate"
+  
+    - name: basic_sanity_gate
+      type: Bash
+      configuration:
+        requiresApproval: true
+        inputResources:
+          - name: trigger_basic
+      execution:
+        onExecute:
+          - echo "Basic sanity done"
+      
+  - name: Sanity_Basic
+    configuration:
+      inputResources:
+        - name: trigger_basic
+    steps:
+      - name: trigger_basic
+        type: Bash
+        execution:
+          onStart:
+            - echo "triggerRunId is ${triggerRunId}"
+            - printenv
+

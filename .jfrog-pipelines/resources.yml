@@ -1,0 +1,5 @@
+resources:
+  - name: trigger_basic
+    type: PropertyBag
+    configuration:
+      key: value
