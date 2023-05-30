@@ -3,3 +3,10 @@ resources:
     type: PropertyBag
     configuration:
       key: value
+  - name: this_repo
+    type: GitRepo
+    configuration:
+      gitProvider: nawaz_bbs
+      path: ~KHAZINA/testing
+      files:
+        include: \scripts\/.+\b

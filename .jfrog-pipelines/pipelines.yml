@@ -22,14 +22,31 @@ pipelines:
           - echo "Basic sanity done"
       
   - name: Sanity_Basic
-    configuration:
-      inputResources:
-        - name: trigger_basic
     steps:
       - name: trigger_basic
         type: Bash
+        configuration:
+          inputResources:
+            - name: trigger_basic
         execution:
           onStart:
             - echo "triggerRunId is ${triggerRunId}"
             - printenv
+      - name: approveStep
+        type: Bash
+        configuration:
+          inputSteps:
+            - name: trigger_basic
+          inputResources:
+            - name: this_repo
+              trigger: false
+          integrations:
+            - name: sanity_platform
+        execution:
+          onStart:
+            - pushd ${res_this_repo_resourcePath}/scripts
+            - npm ci
+            - export API_URL="${int_sanity_platform_url}/pipelines/api/v1"
+            - export API_TOKEN="Bearer ${int_sanity_platform_accessToken}"
+            - node index.js sanityGate --stepName $qualityGateStep --runId $triggerRunId --approved --comment "approved my api"
 
