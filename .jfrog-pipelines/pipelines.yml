@@ -8,6 +8,7 @@ pipelines:
           - name: state_sanity
           - name: basic_sanity
           - name: step_workflow_sanity
+          - name: workflow_sanity
       execution:
         onStart: 
           - write_output basic_sanity "triggerRunId=${run_id}"
@@ -18,6 +19,9 @@ pipelines:
 
           - write_output step_workflow_sanity "triggerRunId=${run_id}"
           - write_output step_workflow_sanity "qualityGateStep=step_workflow_sanity_gate"
+
+          - write_output workflow_sanity "triggerRunId=${run_id}"
+          - write_output workflow_sanity "qualityGateStep=workflow_sanity_gate"
   
     - name: basic_sanity_gate
       type: Bash
@@ -48,6 +52,16 @@ pipelines:
       execution:
         onExecute:
           - echo "Step Workflow Sanity done"
+    
+    - name: workflow_sanity_gate
+      type: Bash
+      configuration:
+        requiresApproval: true
+        inputResources:
+          - name: workflow_sanity
+      execution:
+        onExecute:
+          - echo "Worklow sanity done"
 
     - name: check_sanity
       type: Bash
@@ -56,6 +70,7 @@ pipelines:
           - name: basic_sanity_gate
           - name: state_sanity_gate
           - name: step_workflow_sanity_gate
+          - name: workflow_sanity_gate
       execution:
         onExecute:
           - echo "All sanity done"

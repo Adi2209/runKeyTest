@@ -1,0 +1,10 @@
+resources:
+  - name: workflow_sanity
+    type: PropertyBag
+    configuration:
+      key: workflow_sanity
+  
+  - name: workflow_variables
+    type: PropertyBag
+    configuration:
+      key: workflow_variables
