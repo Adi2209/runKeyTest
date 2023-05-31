@@ -12,7 +12,7 @@ pipelines:
           - write_output trigger_basic "triggerRunId=${run_id}"
           - write_output trigger_basic "qualityGateStep=basic_sanity_gate"
           - write_output run_varaibles_sanity "triggerRunId=${run_id}"
-          - write_output run_varaibles_sanity "qualityGateStep=basic_sanity_gate"
+          - write_output run_varaibles_sanity "qualityGateStep=basic_run_varaibles_gate"
   
     - name: basic_sanity_gate
       type: Bash

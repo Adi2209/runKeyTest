@@ -38,7 +38,7 @@ pipelines:
     execution:
       onExecute:
       - echo $keyA
-      - if [[ "${keyA}" != "valueA" ]]; then echo "run variables are different" fi
+      - if [ $keyA != "valueA" ]; then echo "run variables are different"; fi
       - add_run_variables "keyA=valueB"
   - name: stepD
     type: Bash
@@ -59,7 +59,7 @@ pipelines:
     type: Bash
     execution:
       onExecute:
-        - if [[ "${keyA}" != "valueC" ]]; then echo "run variables are different" fi
+        - if [ $keyA != "valueC" ]; then echo "run variables are different"; fi
   - name: approve_sanity
     configuration:
       inputSteps:
