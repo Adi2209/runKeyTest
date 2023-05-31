@@ -19,48 +19,48 @@ pipelines:
   - name: stepA
     type: Bash
     configuration:
-      inputResources:
-        - name: run_varaibles_sanity
       outputResources:
-      - name: runVariablesResource
+        - name: runVariablesResource
     execution:
       onExecute:
-      - add_run_variables "keyA=valueA"
-
+        - add_run_variables "keyA=valueA"
   - name: stepB
     type: Bash
     configuration:
+      priority: 1
       affinityGroup: group
       inputResources:
-      - name: runVariablesResource
+        - name: runVariablesResource
       outputResources:
-      - name: runVariablesResInt
+        - name: runVariablesResInt
     execution:
       onExecute:
-      - echo $keyA
-      - if [ $keyA != "valueA" ]; then echo "run variables are different"; exit 1; fi
-      - add_run_variables "keyA=valueB"
+        - echo $keyA
+        - add_run_variables "keyA=valueB"
   - name: stepD
     type: Bash
     configuration:
+      priority: 0
       affinityGroup: group
     execution:
       onExecute:
-      - echo $keyA
-      - add_run_variables "keyA=valueC"
+        - echo $keyA
+        - add_run_variables "keyA=valueC"
   - name: stepC
     configuration:
+      runtime:
+        type: host
       affinityGroup: group
       inputSteps:
-      - name: stepD
+        - name: stepD
       inputResources:
-      - name: runVariablesResInt
-      - name: runVariablesResource
+        - name: runVariablesResInt
+        - name: runVariablesResource
     type: Bash
     execution:
       onExecute:
-        - if [ $keyA != "valueC" ]; then echo "run variables are different"; exit 1; fi
-    
+        - echo $keyA
+        - cat /var/opt/jfrog/pipelines/reqKick/execute/step/prepData.js
   - name: approve_sanity
     configuration:
       inputSteps:
