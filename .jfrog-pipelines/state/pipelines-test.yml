@@ -8,7 +8,7 @@ resources:
     configuration:
       some_key: some_value
 pipelines:
-  - name: test_run_variables
+  - name: test_run_variables_test
     steps:
     - name: stepA
       type: Bash
