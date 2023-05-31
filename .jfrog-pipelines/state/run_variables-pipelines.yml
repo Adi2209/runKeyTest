@@ -38,7 +38,7 @@ pipelines:
     execution:
       onExecute:
       - echo $keyA
-      - if [ $keyA != "valueA" ]; then echo "run variables are different"; fi
+      - if [ $keyA != "valueA" ]; then echo "run variables are different"; exit 1; fi
       - add_run_variables "keyA=valueB"
   - name: stepD
     type: Bash
@@ -59,14 +59,19 @@ pipelines:
     type: Bash
     execution:
       onExecute:
-        - if [ $keyA != "valueC" ]; then echo "run variables are different"; fi
+        - if [ $keyA != "valueC" ]; then echo "run variables are different"; exit 1; fi
+    
   - name: approve_sanity
     configuration:
       inputSteps:
         - name: stepC
+          status:
+            - "success"
       inputResources:
         - name: this_repo
         - name: run_varaibles_sanity
+      integrations:
+        - name: sanity_platform
     type: Bash
     execution:
       onExecute:
@@ -74,4 +79,22 @@ pipelines:
         - npm ci
         - export API_URL="${int_sanity_platform_url}/pipelines/api/v1"
         - export API_TOKEN="Bearer ${int_sanity_platform_accessToken}"
-        - node index.js sanityGate --stepName $qualityGateStep --runId $triggerRunId --approved --comment "approved my api"
+        - node index.js sanityGate --stepName $qualityGateStep --runId $triggerRunId --approved --comment "approved all tests passed"
+
+  - name: reject_sanity
+    configuration:
+      inputSteps:
+        - name: stepC
+      inputResources:
+        - name: this_repo
+        - name: run_varaibles_sanity
+      integrations:
+        - name: sanity_platform
+    type: Bash
+    execution:
+      onExecute:
+        - pushd ${res_this_repo_resourcePath}/scripts
+        - npm ci
+        - export API_URL="${int_sanity_platform_url}/pipelines/api/v1"
+        - export API_TOKEN="Bearer ${int_sanity_platform_accessToken}"
+        - node index.js sanityGate --stepName $qualityGateStep --runId $triggerRunId --comment "rejected because few of the tests failed"
