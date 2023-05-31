@@ -27,7 +27,6 @@ pipelines:
   - name: stepB
     type: Bash
     configuration:
-      priority: 1
       affinityGroup: group
       inputResources:
         - name: runVariablesResource
@@ -40,7 +39,6 @@ pipelines:
   - name: stepD
     type: Bash
     configuration:
-      priority: 0
       affinityGroup: group
     execution:
       onExecute:
@@ -61,44 +59,44 @@ pipelines:
       onExecute:
         - echo $keyA
         - cat /var/opt/jfrog/pipelines/reqKick/execute/step/prepData.js
-  - name: approve_sanity
-    configuration:
-      inputSteps:
-        - name: stepC
-      inputResources:
-        - name: this_repo
-        - name: run_varaibles_sanity
-      integrations:
-        - name: sanity_platform
-    type: Bash
-    execution:
-      onExecute:
-        - pushd ${res_this_repo_resourcePath}/scripts
-        - npm ci
-        - export API_URL="${int_sanity_platform_url}/pipelines/api/v1"
-        - export API_TOKEN="Bearer ${int_sanity_platform_accessToken}"
-        - node index.js sanityGate --stepName $qualityGateStep --runId $triggerRunId --approved --comment "approved all tests passed"
+  # - name: approve_sanity
+  #   configuration:
+  #     inputSteps:
+  #       - name: stepC
+  #     inputResources:
+  #       - name: this_repo
+  #       - name: run_varaibles_sanity
+  #     integrations:
+  #       - name: sanity_platform
+  #   type: Bash
+  #   execution:
+  #     onExecute:
+  #       - pushd ${res_this_repo_resourcePath}/scripts
+  #       - npm ci
+  #       - export API_URL="${int_sanity_platform_url}/pipelines/api/v1"
+  #       - export API_TOKEN="Bearer ${int_sanity_platform_accessToken}"
+  #       - node index.js sanityGate --stepName $qualityGateStep --runId $triggerRunId --approved --comment "approved all tests passed"
 
-  - name: reject_sanity
-    configuration:
-      inputSteps:
-        - name: stepC
-          status:
-            - "failure"
-            - "error"
-            - "skipped"
-            - "cancelled"
-            - "timeout"
-      inputResources:
-        - name: this_repo
-        - name: run_varaibles_sanity
-      integrations:
-        - name: sanity_platform
-    type: Bash
-    execution:
-      onExecute:
-        - pushd ${res_this_repo_resourcePath}/scripts
-        - npm ci
-        - export API_URL="${int_sanity_platform_url}/pipelines/api/v1"
-        - export API_TOKEN="Bearer ${int_sanity_platform_accessToken}"
-        - node index.js sanityGate --stepName $qualityGateStep --runId $triggerRunId --comment "rejected because few of the tests failed"
+  # - name: reject_sanity
+  #   configuration:
+  #     inputSteps:
+  #       - name: stepC
+  #         status:
+  #           - "failure"
+  #           - "error"
+  #           - "skipped"
+  #           - "cancelled"
+  #           - "timeout"
+  #     inputResources:
+  #       - name: this_repo
+  #       - name: run_varaibles_sanity
+  #     integrations:
+  #       - name: sanity_platform
+  #   type: Bash
+  #   execution:
+  #     onExecute:
+  #       - pushd ${res_this_repo_resourcePath}/scripts
+  #       - npm ci
+  #       - export API_URL="${int_sanity_platform_url}/pipelines/api/v1"
+  #       - export API_TOKEN="Bearer ${int_sanity_platform_accessToken}"
+  #       - node index.js sanityGate --stepName $qualityGateStep --runId $triggerRunId --comment "rejected because few of the tests failed"
