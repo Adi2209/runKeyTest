@@ -14,7 +14,7 @@ resources:
     some_key: some_value
 
 pipelines:
-- name: test_run_variables
+- name: Sanity_test_run_variables
   steps:
   - name: stepA
     type: Bash
@@ -66,7 +66,7 @@ pipelines:
         - name: stepC
       inputResources:
         - name: this_repo
-        - name: trigger_basic
+        - name: run_varaibles_sanity
     type: Bash
     execution:
       onExecute:
