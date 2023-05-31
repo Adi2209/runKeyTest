@@ -66,6 +66,7 @@ pipelines:
         - name: stepC
       inputResources:
         - name: this_repo
+        - name: trigger_basic
     type: Bash
     execution:
       onExecute:

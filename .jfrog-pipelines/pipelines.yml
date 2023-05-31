@@ -53,6 +53,7 @@ pipelines:
           inputResources:
             - name: this_repo
               trigger: false
+            - name: trigger_basic
           integrations:
             - name: sanity_platform
         execution:
