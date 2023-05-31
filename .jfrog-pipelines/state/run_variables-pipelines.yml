@@ -65,8 +65,6 @@ pipelines:
     configuration:
       inputSteps:
         - name: stepC
-          status:
-            - "success"
       inputResources:
         - name: this_repo
         - name: run_varaibles_sanity
@@ -85,6 +83,12 @@ pipelines:
     configuration:
       inputSteps:
         - name: stepC
+          status:
+            - "failure"
+            - "error"
+            - "skipped"
+            - "cancelled"
+            - "timeout"
       inputResources:
         - name: this_repo
         - name: run_varaibles_sanity
