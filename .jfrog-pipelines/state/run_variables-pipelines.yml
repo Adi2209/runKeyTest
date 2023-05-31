@@ -1,0 +1,76 @@
+resources:
+- name: runVariablesResource
+  type: PropertyBag
+  configuration:
+    some_key: some_value
+- name: runVariablesResInt
+  type: PropertyBag
+  configuration:
+    some_key: some_value
+
+- name: run_varaibles_sanity
+  type: PropertyBag
+  configuration:
+    some_key: some_value
+
+pipelines:
+- name: test_run_variables
+  steps:
+  - name: stepA
+    type: Bash
+    configuration:
+      inputResources:
+        - name: run_varaibles_sanity
+      outputResources:
+      - name: runVariablesResource
+    execution:
+      onExecute:
+      - add_run_variables "keyA=valueA"
+
+  - name: stepB
+    type: Bash
+    configuration:
+      affinityGroup: group
+      inputResources:
+      - name: runVariablesResource
+      outputResources:
+      - name: runVariablesResInt
+    execution:
+      onExecute:
+      - echo $keyA
+      - if [[ "${keyA}" != "valueA" ]]; then echo "run variables are different" fi
+      - add_run_variables "keyA=valueB"
+  - name: stepD
+    type: Bash
+    configuration:
+      affinityGroup: group
+    execution:
+      onExecute:
+      - echo $keyA
+      - add_run_variables "keyA=valueC"
+  - name: stepC
+    configuration:
+      affinityGroup: group
+      inputSteps:
+      - name: stepD
+      inputResources:
+      - name: runVariablesResInt
+      - name: runVariablesResource
+    type: Bash
+    execution:
+      onExecute:
+        - if [[ "${keyA}" != "valueC" ]]; then echo "run variables are different" fi
+  - name: approve_sanity
+    configuration:
+      inputSteps:
+        - name: stepC
+      inputResources:
+        - name: this_repo
+    type: Bash
+    execution:
+      onExecute:
+        - pushd ${res_this_repo_resourcePath}/scripts
+        - npm ci
+        - export API_URL="${int_sanity_platform_url}/pipelines/api/v1"
+        - export API_TOKEN="Bearer ${int_sanity_platform_accessToken}"
+        - node index.js sanityGate --stepName $qualityGateStep --runId $triggerRunId --approved --comment "approved my api"

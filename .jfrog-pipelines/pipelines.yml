@@ -6,10 +6,13 @@ pipelines:
       configuration:
         outputResources:
           - name: trigger_basic
+          - name: run_varaibles_sanity
       execution:
         onStart: 
           - write_output trigger_basic "triggerRunId=${run_id}"
           - write_output trigger_basic "qualityGateStep=basic_sanity_gate"
+          - write_output run_varaibles_sanity "triggerRunId=${run_id}"
+          - write_output run_varaibles_sanity "qualityGateStep=basic_sanity_gate"
   
     - name: basic_sanity_gate
       type: Bash
@@ -17,6 +20,16 @@ pipelines:
         requiresApproval: true
         inputResources:
           - name: trigger_basic
+      execution:
+        onExecute:
+          - echo "Basic sanity done"
+
+    - name: basic_run_varaibles_gate
+      type: Bash
+      configuration:
+        requiresApproval: true
+        inputResources:
+          - name: run_varaibles_sanity
       execution:
         onExecute:
           - echo "Basic sanity done"
