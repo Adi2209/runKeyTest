@@ -33,6 +33,29 @@ pipelines:
       execution:
         onExecute:
           - echo "Basic sanity done"
+
+
+    - name: fail_if_sanity_failed
+      type: Bash
+      configuration:
+        inputSteps:
+          - name: basic_sanity_gate
+            status:
+            - "failure"
+            - "error"
+            - "skipped"
+            - "cancelled"
+            - "timeout"
+          - name: basic_run_varaibles_gate
+            status:
+              - "failure"
+              - "error"
+              - "skipped"
+              - "cancelled"
+              - "timeout"
+      execution:
+        onExecute:
+          - exit 1
       
   - name: Sanity_Basic
     steps:
