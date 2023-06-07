@@ -42,7 +42,7 @@ pipelines:
       configuration:
         inputSteps:
           - name: run_variables_series_gate
-          - name: run_variables_series_gate
+          - name: run_variables_access_gate
       execution:
         onExecute:
           - echo "All sanity done"

@@ -38,7 +38,7 @@ pipelines:
     configuration:
       priority: 2
       inputResources:
-        - name: run_varaibles_sanity
+        - name: run_varaibles_access
       affinityGroup: group
     execution:
       onExecute:
