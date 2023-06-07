@@ -18,7 +18,7 @@ pipelines:
       configuration:
         requiresApproval: true
         inputResources:
-          - name: trigger_basic
+          - name: basic_sanity
       execution:
         onExecute:
           - echo "Basic sanity done"
