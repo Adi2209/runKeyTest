@@ -6,10 +6,11 @@ pipelines:
       configuration:
         outputResources:
           - name: state_sanity
+          - name: basic_sanity
       execution:
         onStart: 
-          - write_output trigger_basic "triggerRunId=${run_id}"
-          - write_output trigger_basic "qualityGateStep=basic_sanity_gate"
+          - write_output basic_sanity "triggerRunId=${run_id}"
+          - write_output basic_sanity "qualityGateStep=basic_sanity_gate"
           - write_output state_sanity "triggerRunId=${run_id}"
           - write_output state_sanity "qualityGateStep=state_sanity_gate"
   
