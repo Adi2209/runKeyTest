@@ -1,0 +1,13 @@
+resources:
+  - name: run_varaibles
+    type: PropertyBag
+    configuration:
+      key: value
+  - name: run_varaibles_access
+    type: PropertyBag
+    configuration:
+      key: value
+  - name: run_varaibles_series
+    type: PropertyBag
+    configuration:
+      key: value

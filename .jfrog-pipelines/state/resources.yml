@@ -1,0 +1,5 @@
+resources:
+  - name: state_sanity
+    type: PropertyBag
+    configuration:
+      key: value

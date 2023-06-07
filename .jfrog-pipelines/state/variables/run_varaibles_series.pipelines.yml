@@ -1,0 +1,108 @@
+resources:
+- name: runVariablesResource
+  type: PropertyBag
+  configuration:
+    some_key: some_value
+
+- name: runVariablesResInt
+  type: PropertyBag
+  configuration:
+    some_key: some_value
+
+- name: run_varaibles_sanity_series
+  type: PropertyBag
+  configuration:
+    some_key: some_value
+
+pipelines:
+- name: Sanity_test_run_variables_series
+  steps:
+  - name: stepA1
+    type: Bash
+    configuration:
+      inputResources:
+        - name: run_varaibles_series
+      outputResources:
+        - name: runVariablesResource
+    execution:
+      onExecute:
+        - add_run_variables "keyA=valueA"
+  - name: stepB1
+    type: Bash
+    configuration:
+      inputResources:
+        - name: runVariablesResource
+      outputResources:
+        - name: runVariablesResInt
+    execution:
+      onExecute:
+        - echo $keyA
+        - add_run_variables "keyA=valueB"
+        - sleep 10s
+  - name: stepD1
+    type: Bash
+    configuration:
+      priority: 2
+      inputResources:
+        - name: run_varaibles_series
+      affinityGroup: group
+    execution:
+      onExecute:
+        - echo $keyA
+        - add_run_variables "keyA=valueC"
+  - name: stepC1
+    configuration:
+      runtime:
+        type: host
+      affinityGroup: group
+      inputSteps:
+        - name: stepD1
+      inputResources:
+        - name: runVariablesResInt
+        - name: runVariablesResource
+    type: Bash
+    execution:
+      onExecute:
+        - echo $keyA
+        - if [ "$keyA" != "valueC" ]; then echo "run variables dont match"; exit 1; fi;
+  - name: approve_sanity
+    configuration:
+      inputSteps:
+        - name: stepC1
+      inputResources:
+        - name: this_repo
+        - name: run_varaibles_series
+      integrations:
+        - name: sanity_platform
+    type: Bash
+    execution:
+      onExecute:
+        - pushd ${res_this_repo_resourcePath}/scripts
+        - npm ci
+        - export API_URL="${int_sanity_platform_url}/pipelines/api/v1"
+        - export API_TOKEN="Bearer ${int_sanity_platform_accessToken}"
+        - node index.js sanityGate --stepName $qualityGateStep --runId $triggerRunId --approved --comment "approved all tests passed"
+
+  - name: reject_sanity
+    configuration:
+      inputSteps:
+        - name: stepC1
+          status:
+            - "failure"
+            - "error"
+            - "skipped"
+            - "cancelled"
+            - "timeout"
+      inputResources:
+        - name: this_repo
+        - name: run_varaibles_series
+      integrations:
+        - name: sanity_platform
+    type: Bash
+    execution:
+      onExecute:
+        - pushd ${res_this_repo_resourcePath}/scripts
+        - npm ci
+        - export API_URL="${int_sanity_platform_url}/pipelines/api/v1"
+        - export API_TOKEN="Bearer ${int_sanity_platform_accessToken}"
+        - node index.js sanityGate --stepName $qualityGateStep --runId $triggerRunId --comment "rejected because few of the tests failed"

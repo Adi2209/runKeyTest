@@ -8,19 +8,14 @@ resources:
   configuration:
     some_key: some_value
 
-- name: run_varaibles_sanity
-  type: PropertyBag
-  configuration:
-    some_key: some_value
-
 pipelines:
-- name: Sanity_test_run_variables
+- name: Sanity_test_run_variables_access
   steps:
   - name: stepA1
     type: Bash
     configuration:
       inputResources:
-        - name: run_varaibles_sanity
+        - name: run_varaibles_access
       outputResources:
         - name: runVariablesResource
     execution:
@@ -63,14 +58,14 @@ pipelines:
     execution:
       onExecute:
         - echo $keyA
-        - if [ "$keyA" != "valueC" ]; then echo "run variables dont match"; fi;
+        - if [ "$keyA" != "valueC" ]; then echo "run variables dont match"; exit 1; fi;
   - name: approve_sanity
     configuration:
       inputSteps:
         - name: stepC1
       inputResources:
         - name: this_repo
-        - name: run_varaibles_sanity
+        - name: run_varaibles_access
       integrations:
         - name: sanity_platform
     type: Bash
@@ -94,7 +89,7 @@ pipelines:
             - "timeout"
       inputResources:
         - name: this_repo
-        - name: run_varaibles_sanity
+        - name: run_varaibles_access
       integrations:
         - name: sanity_platform
     type: Bash

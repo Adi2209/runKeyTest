@@ -5,14 +5,13 @@ pipelines:
       type: Bash
       configuration:
         outputResources:
-          - name: trigger_basic
-          - name: run_varaibles_sanity
+          - name: state_sanity
       execution:
         onStart: 
           - write_output trigger_basic "triggerRunId=${run_id}"
           - write_output trigger_basic "qualityGateStep=basic_sanity_gate"
-          - write_output run_varaibles_sanity "triggerRunId=${run_id}"
-          - write_output run_varaibles_sanity "qualityGateStep=basic_run_varaibles_gate"
+          - write_output state_sanity "triggerRunId=${run_id}"
+          - write_output state_sanity "qualityGateStep=state_sanity_gate"
   
     - name: basic_sanity_gate
       type: Bash
@@ -24,15 +23,15 @@ pipelines:
         onExecute:
           - echo "Basic sanity done"
 
-    - name: basic_run_varaibles_gate
+    - name: state_sanity_gate
       type: Bash
       configuration:
         requiresApproval: true
         inputResources:
-          - name: run_varaibles_sanity
+          - name: state_sanity
       execution:
         onExecute:
-          - echo "Basic sanity done"
+          - echo "State sanity done"
 
 
     - name: check_sanity
