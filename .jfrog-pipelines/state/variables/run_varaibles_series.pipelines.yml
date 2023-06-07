@@ -1,10 +1,10 @@
 resources:
-- name: runVariablesResource
+- name: runVariablesResource1
   type: PropertyBag
   configuration:
     some_key: some_value
 
-- name: runVariablesResInt
+- name: runVariablesResInt1
   type: PropertyBag
   configuration:
     some_key: some_value
@@ -23,7 +23,7 @@ pipelines:
       inputResources:
         - name: run_varaibles_series
       outputResources:
-        - name: runVariablesResource
+        - name: runVariablesResource1
     execution:
       onExecute:
         - add_run_variables "keyA=valueA"
@@ -31,9 +31,9 @@ pipelines:
     type: Bash
     configuration:
       inputResources:
-        - name: runVariablesResource
+        - name: runVariablesResource1
       outputResources:
-        - name: runVariablesResInt
+        - name: runVariablesResInt1
     execution:
       onExecute:
         - echo $keyA
@@ -58,8 +58,8 @@ pipelines:
       inputSteps:
         - name: stepD1
       inputResources:
-        - name: runVariablesResInt
-        - name: runVariablesResource
+        - name: runVariablesResInt1
+        - name: runVariablesResource1
     type: Bash
     execution:
       onExecute:
