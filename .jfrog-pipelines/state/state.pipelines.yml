@@ -11,7 +11,7 @@ pipelines:
       execution:
         onStart: 
           - write_output run_variables "triggerRunId=${run_id}"
-          - write_output run_variables "qualityGateStep=run_variables_series_gate"
+          - write_output run_variables "qualityGateStep=run_variables_gate"
   
     - name: run_variables_gate
       type: Bash

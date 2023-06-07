@@ -14,7 +14,7 @@ class Gate {
     const getStepPromisified =  util.promisify(this.adapter.getSteps).bind(this.adapter);
     const steps = await getStepPromisified(`runIds=${this.runId}&names=${this.stepName}&limit=1`);
     if (!steps || steps.length !== 1) {
-      throw new Error(`step name ${this.stepName} not found for runId ${runId}`);
+      throw new Error(`step name ${this.stepName} not found for runId ${this.runId}`);
     }
     return steps[0].id;
   }
