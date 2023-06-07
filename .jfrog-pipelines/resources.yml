@@ -1,5 +1,5 @@
 resources:
-  - name: trigger_basic
+  - name: basic_sanity
     type: PropertyBag
     configuration:
       key: value
