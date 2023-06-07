@@ -39,7 +39,7 @@ pipelines:
       configuration:
         inputSteps:
           - name: basic_sanity_gate
-          - name: basic_run_varaibles_gate
+          - name: state_sanity_gate
       execution:
         onExecute:
           - echo "All sanity done"
