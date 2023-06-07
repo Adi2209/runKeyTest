@@ -16,7 +16,7 @@ resources:
 pipelines:
 - name: Sanity_test_run_variables
   steps:
-  - name: stepA
+  - name: stepA1
     type: Bash
     configuration:
       inputResources:
@@ -26,7 +26,7 @@ pipelines:
     execution:
       onExecute:
         - add_run_variables "keyA=valueA"
-  - name: stepB
+  - name: stepB1
     type: Bash
     configuration:
       inputResources:
@@ -38,7 +38,7 @@ pipelines:
         - echo $keyA
         - add_run_variables "keyA=valueB"
         - sleep 10s
-  - name: stepD
+  - name: stepD1
     type: Bash
     configuration:
       priority: 2
@@ -49,13 +49,13 @@ pipelines:
       onExecute:
         - echo $keyA
         - add_run_variables "keyA=valueC"
-  - name: stepC
+  - name: stepC1
     configuration:
       runtime:
         type: host
       affinityGroup: group
       inputSteps:
-        - name: stepD
+        - name: stepD1
       inputResources:
         - name: runVariablesResInt
         - name: runVariablesResource
