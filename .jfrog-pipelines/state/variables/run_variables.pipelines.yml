@@ -53,7 +53,7 @@ pipelines:
           - name: check_sanity
         inputResources:
           - name: this_repo
-          - name: run_varaibles
+          - name: run_variables
         integrations:
           - name: sanity_platform
       type: Bash
@@ -77,7 +77,7 @@ pipelines:
               - "timeout"
         inputResources:
           - name: this_repo
-          - name: run_varaibles
+          - name: run_variables
         integrations:
           - name: sanity_platform
       type: Bash
