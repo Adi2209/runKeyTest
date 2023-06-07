@@ -30,6 +30,7 @@ pipelines:
     type: Bash
     configuration:
       affinityGroup: group
+      priority: 1
       inputResources:
         - name: runVariablesResource
       outputResources:
@@ -41,6 +42,7 @@ pipelines:
   - name: stepD
     type: Bash
     configuration:
+      priority: 2
       inputResources:
         - name: run_varaibles_sanity
       affinityGroup: group
@@ -62,7 +64,7 @@ pipelines:
     execution:
       onExecute:
         - echo $keyA
-        - cat /var/opt/jfrog/pipelines/reqKick/execute/step/prepData.js
+        - if [ "$keyA" != "valueC" ]; then echo "run variables dont match"; fi;
   - name: approve_sanity
     configuration:
       inputSteps:
