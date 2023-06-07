@@ -7,18 +7,18 @@ pipelines:
         inputResources:
           - name: state_sanity
         outputResources:
-          - name: run_varaibles
+          - name: run_variables
       execution:
         onStart: 
-          - write_output run_varaibles "triggerRunId=${run_id}"
-          - write_output run_varaibles "qualityGateStep=run_variables_series_gate"
+          - write_output run_variables "triggerRunId=${run_id}"
+          - write_output run_variables "qualityGateStep=run_variables_series_gate"
   
     - name: run_variables_gate
       type: Bash
       configuration:
         requiresApproval: true
         inputResources:
-          - name: run_varaibles
+          - name: run_variables
       execution:
         onExecute:
           - echo "Basic run variables done"
