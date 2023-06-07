@@ -39,6 +39,7 @@ pipelines:
       onExecute:
         - echo $keyA
         - add_run_variables "keyA=valueB"
+        - sleep 10s
   - name: stepD
     type: Bash
     configuration:
