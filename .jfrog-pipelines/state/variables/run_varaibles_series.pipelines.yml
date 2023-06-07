@@ -27,48 +27,42 @@ pipelines:
     execution:
       onExecute:
         - add_run_variables "keyA=valueA"
+  
   - name: stepB1
     type: Bash
     configuration:
       inputResources:
         - name: runVariablesResource1
-      outputResources:
-        - name: runVariablesResInt1
     execution:
       onExecute:
-        - echo $keyA
+        - if [ "$keyA" != "valueA" ]; then echo "run variables dont match"; exit 1; fi;
         - add_run_variables "keyA=valueB"
-        - sleep 10s
+
+  - name: stepC1
+    configuration:
+      affinityGroup: group
+      inputSteps:
+        - name: stepB1
+    type: Bash
+    execution:
+      onExecute:
+        - if [ "$keyA" != "valueB" ]; then echo "run variables dont match"; exit 1; fi;
+        - add_run_variables "keyA=valueC"
+  
   - name: stepD1
     type: Bash
     configuration:
-      priority: 2
-      inputResources:
-        - name: run_varaibles_series
-      affinityGroup: group
-    execution:
-      onExecute:
-        - echo $keyA
-        - add_run_variables "keyA=valueC"
-  - name: stepC1
-    configuration:
-      runtime:
-        type: host
-      affinityGroup: group
       inputSteps:
-        - name: stepD1
-      inputResources:
-        - name: runVariablesResInt1
-        - name: runVariablesResource1
-    type: Bash
+        - name: stepC1
+      affinityGroup: group
     execution:
       onExecute:
-        - echo $keyA
-        - if [ "$keyA" != "valueC" ]; then echo "run variables dont match"; exit 1; fi;
+      - if [ "$keyA" != "valueC" ]; then echo "run variables dont match"; exit 1; fi;
+  
   - name: approve_sanity
     configuration:
       inputSteps:
-        - name: stepC1
+        - name: stepD1
       inputResources:
         - name: this_repo
         - name: run_varaibles_series
@@ -86,7 +80,7 @@ pipelines:
   - name: reject_sanity
     configuration:
       inputSteps:
-        - name: stepC1
+        - name: stepD1
           status:
             - "failure"
             - "error"

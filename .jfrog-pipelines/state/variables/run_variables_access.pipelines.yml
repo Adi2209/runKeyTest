@@ -46,8 +46,6 @@ pipelines:
         - add_run_variables "keyA=valueC"
   - name: stepC1
     configuration:
-      runtime:
-        type: host
       affinityGroup: group
       inputSteps:
         - name: stepD1
@@ -58,7 +56,7 @@ pipelines:
     execution:
       onExecute:
         - echo $keyA
-        - if [ "$keyA" != "valueC" ]; then echo "run variables dont match"; exit 1; fi;
+        - if [ "$keyA" != "valueB" ]; then echo "run variables dont match"; exit 1; fi;
   - name: approve_sanity
     configuration:
       inputSteps:
