@@ -85,7 +85,7 @@ pipelines:
   - name: reject_sanity
     configuration:
       inputSteps:
-        - name: stepC
+        - name: stepC1
           status:
             - "failure"
             - "error"
