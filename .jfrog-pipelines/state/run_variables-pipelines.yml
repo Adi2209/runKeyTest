@@ -29,8 +29,6 @@ pipelines:
   - name: stepB
     type: Bash
     configuration:
-      affinityGroup: group
-      priority: 1
       inputResources:
         - name: runVariablesResource
       outputResources:
