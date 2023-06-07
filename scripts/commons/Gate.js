@@ -10,10 +10,11 @@ class Gate {
   }
 
   async getApprovalGateStepId() {
+    console.info(`StepName: ${this.stepName} RunId: ${this.runId}`)
     const getStepPromisified =  util.promisify(this.adapter.getSteps).bind(this.adapter);
     const steps = await getStepPromisified(`runIds=${this.runId}&names=${this.stepName}&limit=1`);
     if (!steps || steps.length !== 1) {
-      throw new Error(`step name ${stepName} not found for runId ${runId}`);
+      throw new Error(`step name ${this.stepName} not found for runId ${runId}`);
     }
     return steps[0].id;
   }
