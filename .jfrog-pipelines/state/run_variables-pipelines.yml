@@ -67,7 +67,7 @@ pipelines:
   - name: approve_sanity
     configuration:
       inputSteps:
-        - name: stepC
+        - name: stepC1
       inputResources:
         - name: this_repo
         - name: run_varaibles_sanity
