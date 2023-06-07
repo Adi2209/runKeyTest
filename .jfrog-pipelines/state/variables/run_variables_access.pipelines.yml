@@ -56,7 +56,7 @@ pipelines:
     execution:
       onExecute:
         - echo $keyA
-        - if [ "$keyA" != "valueB" ]; then echo "run variables dont match"; exit 1; fi;
+        - if [ "$keyA" != "valueC" ]; then echo "run variables dont match"; exit 1; fi;
   - name: approve_sanity
     configuration:
       inputSteps:
