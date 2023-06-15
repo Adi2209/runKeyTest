@@ -9,14 +9,17 @@ pipelines:
         outputResources:
           - name: step_workflow_variables
           - name: stepStatusBag
+          - name: conditionalVariableBag
       execution:
         onStart: 
           - write_output step_workflow_variables "triggerRunId=${run_id}"
           - write_output step_workflow_variables "qualityGateStep=step_workflow_gate"
           - write_output stepStatusBag "triggerRunId=${run_id}"
-          - write_output stepStatusBag "qualityGateStep=step_workflow_gate"
+          - write_output stepStatusBag "qualityGateStep=input_step_status_gate"
+          - write_output conditionalVariableBag "triggerRunId=${run_id}"
+          - write_output conditionalVariableBag "qualityGateStep=conditional_variable_gate"
   
-    - name: step_workflow_gate
+    - name: input_step_status_gate
       type: Bash
       configuration:
         requiresApproval: true
@@ -24,21 +27,49 @@ pipelines:
           - name: step_workflow_variables
       execution:
         onExecute:
-          - echo "Basic workflow variables done"
+          - echo "Input Step Status variables done"
 
-    - name: checkStepWorkflowSanity
+    - name: checkInputStepStatusSanity
       type: Bash
       configuration:
         inputSteps:
-          - name: step_workflow_gate
+          - name: input_step_status_gate
       execution:
         onExecute:
-          - echo "All step workflow sanity done"
+          - echo "input step status sanity check"
+        onSuccess:
+          - echo "input step status sanity check done"
+        onFailure:
+          - echo "input step status sanity failed"
+
+    - name: conditional_variable_gate
+      type: Bash
+      configuration:
+        requiresApproval: true
+        inputResources:
+          - name: step_workflow_variables
+      execution:
+        onExecute:
+          - echo "conditional variables done"
+
+    - name: checkConditionalVariableSanity
+      type: Bash
+      configuration:
+        inputSteps:
+          - name: conditional_variable_gate
+      execution:
+        onExecute:
+          - echo "conditional variables sanity check"
+        onSuccess:
+          - echo "conditional variables sanity check done"
+        onFailure:
+          - echo "conditional variables sanity failed"
 
     - name: approve_step_worklfow_sanity
       configuration:
         inputSteps:
-          - name: checkStepWorkflowSanity
+          - name: checkInputStepStatusSanity
+          - name: checkConditionalVariableSanity
         inputResources:
           - name: this_repo
           - name: step_workflow_sanity
@@ -56,7 +87,7 @@ pipelines:
     - name: reject_sanity
       configuration:
         inputSteps:
-          - name: checkStepWorkflowSanity
+          - name: approve_step_worklfow_sanity
             status:
               - "failure"
               - "error"

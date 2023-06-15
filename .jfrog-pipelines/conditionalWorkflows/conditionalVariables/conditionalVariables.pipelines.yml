@@ -1,0 +1,84 @@
+pipelines:
+  - name: Sanity_Conditional_Variables
+    steps:
+      - name: Add_Conditional_Variables
+        type: Bash
+        configuration:
+          inputResources:
+            - name: conditionalVariableBag
+        execution:
+          onExecute:
+            - add_run_variables 'conditionalVariable1=success'
+            - add_run_variables 'conditionalVariable2=failed'
+
+      - name: Check_For_Variable_1
+        type: Bash
+        configuration:
+          condition: 'conditionalVariable1 == "success"'
+          inputSteps:
+            - name: Add_Conditional_Variables
+        execution:
+          onExecute:
+            - echo "step succeded"
+      
+      - name: Check_For_Variable_2
+        type: Bash
+        configuration:
+          condition: 'conditionalVariable2 == "failed"'
+          inputSteps:
+            - name: Add_Conditional_Variables
+        execution:
+          onExecute:
+            - echo "step succeded"
+
+      - name: final_result_check
+        type: Bash
+        configuration:
+          inputSteps:
+            - name: Check_For_Variable_1
+            - name: Check_For_Variable_2
+        execution:
+          onExecute:
+            - echo "variables are set properly"
+
+      - name: approve_sanity
+        type: Bash
+        configuration:
+          inputSteps:
+            - name: final_result_check
+          inputResources:
+            - name: this_repo
+            - name: conditionalVariableBag
+          integrations:
+            - name: sanity_platform
+        execution:
+          onExecute:
+            - pushd ${res_this_repo_resourcePath}/scripts
+            - npm ci
+            - export API_URL="${int_sanity_platform_url}/pipelines/api/v1"
+            - export API_TOKEN="Bearer ${int_sanity_platform_accessToken}"
+            - node index.js sanityGate --stepName $qualityGateStep --runId $triggerRunId --approved --comment "approved all tests passed"
+
+      - name: reject_sanity
+        type: Bash
+        configuration:
+          inputSteps:
+            - name: approve_sanity
+              status:
+                - failure
+                - skipped
+                - timeout
+                - error
+                - cancelled
+          inputResources:
+            - name: this_repo
+            - name: conditionalVariableBag
+          integrations:
+            - name: sanity_platform
+        execution:
+          onExecute:
+            - pushd ${res_this_repo_resourcePath}/scripts
+            - npm ci
+            - export API_URL="${int_sanity_platform_url}/pipelines/api/v1"
+            - export API_TOKEN="Bearer ${int_sanity_platform_accessToken}"
+            - node index.js sanityGate --stepName $qualityGateStep --runId $triggerRunId --comment "rejected because few of the tests failed"
