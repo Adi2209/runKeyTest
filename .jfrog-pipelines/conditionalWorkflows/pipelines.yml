@@ -1,0 +1,78 @@
+pipelines:
+  - name: Sanity_step_workflow_Trigger
+    steps:
+    - name: trigger
+      type: Bash
+      configuration:
+        inputResources:
+          - name: step_workflow_sanity
+        outputResources:
+          - name: step_workflow_variables
+          - name: stepStatusBag
+      execution:
+        onStart: 
+          - write_output step_workflow_variables "triggerRunId=${run_id}"
+          - write_output step_workflow_variables "qualityGateStep=step_workflow_gate"
+          - write_output stepStatusBag "triggerRunId=${run_id}"
+          - write_output stepStatusBag "qualityGateStep=step_workflow_gate"
+  
+    - name: step_workflow_gate
+      type: Bash
+      configuration:
+        requiresApproval: true
+        inputResources:
+          - name: step_workflow_variables
+      execution:
+        onExecute:
+          - echo "Basic workflow variables done"
+
+    - name: checkStepWorkflowSanity
+      type: Bash
+      configuration:
+        inputSteps:
+          - name: step_workflow_gate
+      execution:
+        onExecute:
+          - echo "All step workflow sanity done"
+
+    - name: approve_step_worklfow_sanity
+      configuration:
+        inputSteps:
+          - name: checkStepWorkflowSanity
+        inputResources:
+          - name: this_repo
+          - name: step_workflow_sanity
+        integrations:
+          - name: sanity_platform
+      type: Bash
+      execution:
+        onExecute:
+          - pushd ${res_this_repo_resourcePath}/scripts
+          - npm ci
+          - export API_URL="${int_sanity_platform_url}/pipelines/api/v1"
+          - export API_TOKEN="Bearer ${int_sanity_platform_accessToken}"
+          - node index.js sanityGate --stepName $qualityGateStep --runId $triggerRunId --approved --comment "approved all tests passed"
+
+    - name: reject_sanity
+      configuration:
+        inputSteps:
+          - name: checkStepWorkflowSanity
+            status:
+              - "failure"
+              - "error"
+              - "skipped"
+              - "cancelled"
+              - "timeout"
+        inputResources:
+          - name: this_repo
+          - name: step_workflow_sanity
+        integrations:
+          - name: sanity_platform
+      type: Bash
+      execution:
+        onExecute:
+          - pushd ${res_this_repo_resourcePath}/scripts
+          - npm ci
+          - export API_URL="${int_sanity_platform_url}/pipelines/api/v1"
+          - export API_TOKEN="Bearer ${int_sanity_platform_accessToken}"
+          - node index.js sanityGate --stepName $qualityGateStep --runId $triggerRunId --comment "rejected because few of the tests failed"

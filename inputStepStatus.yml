@@ -1,0 +1,97 @@
+pipelines: 
+  - name: Sanity_inputStepStatus
+    steps:
+      - name: start_step_status_check
+        type: Bash
+        execution:
+          onExecute:
+            - echo "starting check"
+
+      - name: success_step
+        type: Bash
+        configuration:
+          inputSteps:
+            - name: start_step_status_check
+        execution:
+          onStart:
+            - echo "starting step which will be success"
+          onExecute:
+            - echo "This step ran successfully"
+          onComplete:
+            - echo "this should trigger sucess_step_child"
+
+      - name: failed_step
+        type: Bash
+        configuration:
+          allowFailure: true
+          inputSteps:
+            - name: start_step_status_check
+        execution:
+          onStart:
+            - echo "starting step which will going to be failed"
+          onExecute:
+            - echo "This step will fail"
+            - exit 1
+          onComplete:
+            - echo "this should trigger failed_step_child"
+
+      - name: timeout_step
+        type: Bash
+        configuration:
+          allowFailure: true
+          timeoutSeconds: 10
+          inputSteps:
+            - name: start_step_status_check
+        execution:
+          onStart:
+            - echo "starting step that will be going to timeout"
+          onExecute:
+            - echo "This step will be timedout"
+            - sleep 300
+          onComplete:
+            - echo "this should trigger timeout_step_child"
+
+      - name: sucess_step_child
+        type: Bash
+        configuration:
+          inputSteps: 
+            - name: success_step
+              status: 
+                - success
+        execution:
+          onStart: 
+            -  echo "step that is triggered due to success_step"
+          onExecute:
+            - echo "this step should be success"
+          onComplete:
+            - echo "this step is completed"
+
+      - name: failed_step_child
+        type: Bash
+        configuration:
+          inputSteps: 
+            - name: failed_step
+              status: 
+                - failure
+        execution:
+          onStart: 
+            -  echo "step that is triggered due to failed_step"
+          onExecute:
+            - echo "this step should be success"
+          onComplete:
+            - echo "this step is completed"
+
+      - name: timeout_step_child
+        type: Bash
+        configuration:
+          inputSteps: 
+            - name: timeout_step
+              status: 
+                - timeout
+        execution:
+          onStart: 
+            -  echo "step that is triggered due to timeout_step"
+          onExecute:
+            - echo "this step should be success"
+          onComplete:
+            - echo "this step is completed"
