@@ -11,6 +11,7 @@ pipelines:
         - | 
           if [[ $run_number -gt 1 ]]; then
             restore_pipeline_files cache ./cache
+            ls -latr ./cache
             ls -latr ./cache/file$(($run_number - 1)).txt
             echo "working" > cache/file${run_number}.txt
             add_pipeline_files ./cache cache
