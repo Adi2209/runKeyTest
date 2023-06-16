@@ -1,0 +1,5 @@
+resources:
+  - name: allowFailureBag
+    type: PropertyBag
+    configuration:
+      key: allowFailureBag

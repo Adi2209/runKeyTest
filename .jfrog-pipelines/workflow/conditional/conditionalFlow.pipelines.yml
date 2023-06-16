@@ -1,0 +1,80 @@
+pipelines:
+  - name: sanity_conditional_flow
+    steps:
+      - name: triggerConditionalFlow
+        type: Bash
+        configuration:
+          inputResources:
+            - name: conditionalBag
+        execution:
+          onExecute:
+            - add_run_variables 'trigger=true'
+          onFailure:
+            - echo "onFailure"
+
+      - name: stepCondition
+        type: Bash
+        configuration:
+          condition: 'trigger == "true"'
+          allowFailure: true
+          inputSteps:
+            - name: triggerConditionalFlow
+        execution:
+          onExecute:
+            - add_run_variables 'trigger=false'
+            - exit 1;
+
+      - name: validateConditionalFlow
+        type: Bash
+        configuration:
+          inputSteps:
+            - name: stepCondition
+              status:
+                - failure
+        execution:
+          onExecute:
+            - if [ "${trigger}" != "false" ]; then return 1; fi
+          onSuccess:
+            - add_run_variables 'hasPassed=true'
+
+      - name: approve_conditionalFlow
+        configuration:
+          inputSteps:
+            - name: validateConditionalFlow
+          inputResources:
+            - name: this_repo
+            - name: conditionalBag
+          integrations:
+            - name: sanity_platform
+        type: Bash
+        execution:
+          onExecute:
+            - pushd ${res_this_repo_resourcePath}/scripts
+            - npm ci
+            - export API_URL="${int_sanity_platform_url}/pipelines/api/v1"
+            - export API_TOKEN="Bearer ${int_sanity_platform_accessToken}"
+            - node index.js sanityGate --stepName $qualityGateStep --runId $triggerRunId --approved --comment "approved all tests passed"
+
+      - name: reject_conditionalFlow
+        configuration:
+          inputSteps:
+            - name: validateConditionalFlow
+              status:
+                - "failure"
+                - "error"
+                - "skipped"
+                - "cancelled"
+                - "timeout"
+          inputResources:
+            - name: this_repo
+            - name: conditionalBag
+          integrations:
+            - name: sanity_platform
+        type: Bash
+        execution:
+          onExecute:
+            - pushd ${res_this_repo_resourcePath}/scripts
+            - npm ci
+            - export API_URL="${int_sanity_platform_url}/pipelines/api/v1"
+            - export API_TOKEN="Bearer ${int_sanity_platform_accessToken}"
+            - node index.js sanityGate --stepName $qualityGateStep --runId $triggerRunId --comment "rejected from reject_conditionalFlow"

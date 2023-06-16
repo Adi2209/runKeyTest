@@ -1,0 +1,83 @@
+pipelines:
+  - name: sanity_allow_failure
+    steps:
+      - name: stepToFail
+        type: Bash
+        configuration:
+          allowFailure: true
+          inputResources:
+            - name: allowFailureBag
+        execution:
+          onExecute:
+            - return 1;
+
+      - name: stepToTimeout
+        type: Bash
+        configuration:
+          allowFailure: true
+          timeoutSeconds: 10
+          inputSteps:
+            - name: stepToFail
+              status:
+                - failure
+        execution:
+          onExecute:
+            - sleep 300
+
+      - name: finalize_allow_failures
+        type: Bash
+        configuration:
+          inputSteps:
+            - name: stepToTimeout
+              status:
+                - timeout
+        execution:
+          onExecute:
+            - echo "onExecute"
+          onSuccess:
+            - echo "onSuccess"
+          onFailure:
+            - echo "onFailure"
+            - add_run_variables 'hasPassed=true'
+
+      - name: approve_allowFailure
+        configuration:
+          inputSteps:
+            - name: finalize_allow_failures
+          inputResources:
+            - name: this_repo
+            - name: allowFailureBag
+          integrations:
+            - name: sanity_platform
+        type: Bash
+        execution:
+          onExecute:
+            - pushd ${res_this_repo_resourcePath}/scripts
+            - npm ci
+            - export API_URL="${int_sanity_platform_url}/pipelines/api/v1"
+            - export API_TOKEN="Bearer ${int_sanity_platform_accessToken}"
+            - node index.js sanityGate --stepName $qualityGateStep --runId $triggerRunId --approved --comment "approved all tests passed"
+
+      - name: reject_allowFailure
+        configuration:
+          inputSteps:
+            - name: finalize_allow_failures
+              status:
+                - "failure"
+                - "error"
+                - "skipped"
+                - "cancelled"
+                - "timeout"
+          inputResources:
+            - name: this_repo
+            - name: allowFailureBag
+          integrations:
+            - name: sanity_platform
+        type: Bash
+        execution:
+          onExecute:
+            - pushd ${res_this_repo_resourcePath}/scripts
+            - npm ci
+            - export API_URL="${int_sanity_platform_url}/pipelines/api/v1"
+            - export API_TOKEN="Bearer ${int_sanity_platform_accessToken}"
+            - node index.js sanityGate --stepName $qualityGateStep --runId $triggerRunId --comment "rejected from reject_allowFailure"
