@@ -1,0 +1,10 @@
+resources:
+  - name: step_workflow_sanity
+    type: PropertyBag
+    configuration:
+      key: value
+
+  - name: step_workflow_variables
+    type: PropertyBag
+    configuration:
+      key: workflow_variables

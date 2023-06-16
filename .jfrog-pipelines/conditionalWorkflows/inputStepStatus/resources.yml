@@ -1,0 +1,5 @@
+resources:
+  - name: stepStatusBag
+    type: PropertyBag
+    configuration:
+      key: value

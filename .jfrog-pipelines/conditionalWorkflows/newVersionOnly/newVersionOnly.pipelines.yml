@@ -1,0 +1,81 @@
+pipelines:
+  - name: Sanity_New_Version_Check
+    steps:
+      - name: Update_Bag_Resource
+        type: Bash
+        configuration:
+          inputResources:
+            - name: versionBag
+          outputResources:
+            - name: shouldUpdateBag
+            - name: shouldNotUpdateBag
+        execution:
+          onExecute:
+            - write_output shouldUpdateBag "updated=true"
+      
+      - name: New_Version_Pipeline
+        type: Bash
+        configuration:
+          inputResources:
+            - name: shouldUpdateBag
+              newVersionOnly: true
+        execution:
+          onExecute:
+            - echo "New Version Pipeline triggered"
+
+      - name: Old_Version_Pipeline
+        type: Bash
+        configuration:
+          inputResources:
+            - name: shouldNotUpdateBag
+              newVersionOnly: true
+        execution:
+          onExecute:
+            - echo "Old Version Pipeline is Triggered"
+            - echo "Problem in newVersionOnly"
+            - exit 1
+
+      - name: approve_sanity
+        type: Bash
+        configuration:
+          inputSteps:
+            - name: New_Version_Pipeline
+            - name: Old_Version_Pipeline
+              status:
+                - skipped
+          inputResources:
+            - name: this_repo
+            - name: versionBag
+          integrations:
+            - name: sanity_platform
+        execution:
+          onExecute:
+            - pushd ${res_this_repo_resourcePath}/scripts
+            - npm ci
+            - export API_URL="${int_sanity_platform_url}/pipelines/api/v1"
+            - export API_TOKEN="Bearer ${int_sanity_platform_accessToken}"
+            - node index.js sanityGate --stepName $qualityGateStep --runId $triggerRunId --approved --comment "approved all tests passed"
+
+      - name: reject_sanity
+        type: Bash
+        configuration:
+          inputSteps:
+            - name: approve_sanity
+              status:
+                - failure
+                - skipped
+                - timeout
+                - error
+                - cancelled
+          inputResources:
+            - name: this_repo
+            - name: versionBag
+          integrations:
+            - name: sanity_platform
+        execution:
+          onExecute:
+            - pushd ${res_this_repo_resourcePath}/scripts
+            - npm ci
+            - export API_URL="${int_sanity_platform_url}/pipelines/api/v1"
+            - export API_TOKEN="Bearer ${int_sanity_platform_accessToken}"
+            - node index.js sanityGate --stepName $qualityGateStep --runId $triggerRunId --comment "rejected because few of the tests failed"

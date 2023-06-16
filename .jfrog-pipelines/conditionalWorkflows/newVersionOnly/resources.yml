@@ -1,0 +1,13 @@
+resources:
+  - name: versionBag
+    type: PropertyBag
+    configuration:
+      key: value
+  - name: shouldUpdateBag
+    type: PropertyBag
+    configuration:
+      key: value
+  - name: shouldNotUpdateBag
+    type: PropertyBag
+    configuration:
+      key: value
