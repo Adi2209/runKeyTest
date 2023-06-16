@@ -26,7 +26,7 @@ pipelines:
         - name: stepA1
       inputResources:
         - name: this_repo
-        - name: step_state
+        - name: pipeline_state
       integrations:
         - name: sanity_platform
     type: Bash
@@ -50,7 +50,7 @@ pipelines:
             - "timeout"
       inputResources:
         - name: this_repo
-        - name: step_state
+        - name: pipeline_state
       integrations:
         - name: sanity_platform
     type: Bash
