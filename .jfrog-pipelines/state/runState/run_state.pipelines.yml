@@ -85,7 +85,7 @@ pipelines:
     - name: reject_sanity
       configuration:
         inputSteps:
-          - name: run_state
+          - name: approve_sanity
             status:
               - "failure"
               - "error"
@@ -94,7 +94,7 @@ pipelines:
               - "timeout"
         inputResources:
           - name: this_repo
-          - name: run_variables
+          - name: run_state
         integrations:
           - name: sanity_platform
       type: Bash
