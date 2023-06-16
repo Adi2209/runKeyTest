@@ -1,5 +1,5 @@
 pipelines:
-- name: Sanity_test_pipeline_state1
+- name: Sanity_test_pipeline_state2
   steps:
   - name: stepA1
     type: Bash
