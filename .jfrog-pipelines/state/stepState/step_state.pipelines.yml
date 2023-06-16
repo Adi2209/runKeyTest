@@ -17,7 +17,7 @@ pipelines:
             add_cache_files ./cache cache
           else
             mkdir -p cache
-            echo "working" > cache/file0.txt
+            echo "working" > cache/file1.txt
             add_cache_files ./cache cache
           fi
  

@@ -1,5 +1,5 @@
 pipelines:
-- name: Sanity_test_pipeline_states
+- name: Sanity_test_pipeline_state1
   steps:
   - name: stepA1
     type: Bash
@@ -11,13 +11,12 @@ pipelines:
         - | 
           if [[ $run_number -gt 1 ]]; then
             restore_pipeline_files cache ./cache
-            ls -latr ./cache
-            ls -latr ./cache/file$(($run_number - 1)).txt
+            ls -latr ./cache/file$(($run_number - 1))
             echo "working" > cache/file${run_number}.txt
             add_pipeline_files ./cache cache
           else
             mkdir -p cache
-            echo "working" > cache/file0.txt
+            echo "working" > cache/file1.txt
             add_pipeline_files ./cache cache
           fi
  
