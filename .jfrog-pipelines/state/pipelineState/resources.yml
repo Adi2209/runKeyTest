@@ -1,0 +1,5 @@
+resources:
+  - name: pipeline_state
+    type: PropertyBag
+    configuration:
+      key: value

@@ -1,0 +1,17 @@
+resources:
+  - name: run_state
+    type: PropertyBag
+    configuration:
+      key: value
+  - name: run_state_parallel
+    type: PropertyBag
+    configuration:
+      key: value
+  - name: run_state_series
+    type: PropertyBag
+    configuration:
+      key: value
+  - name: run_state_series_parallel
+    type: PropertyBag
+    configuration:
+      key: value

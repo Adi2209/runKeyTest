@@ -1,0 +1,79 @@
+pipelines:
+- name: Sanity_test_run_state_parallel
+  steps:
+  - name: stepA1
+    type: Bash
+    configuration:
+      inputResources:
+        - name: run_state_parallel
+    execution:
+      onExecute:
+        - mkdir -p stateA1
+        - echo "working" > ./stateA1/file.txt
+        - add_run_files ./stateA1 stateA1
+  
+  - name: stepA2
+    type: Bash
+    configuration:
+      inputResources:
+        - name: run_state_parallel
+    execution:
+      onExecute:
+        - mkdir -p stateA2
+        - echo "working" > ./stateA2/file.txt
+        - add_run_files ./stateA2 stateA2
+    
+  - name: stepB
+    type: Bash
+    configuration:
+      inputSteps:
+        - name: stepA1
+        - name: stepA2
+    execution:
+      onExecute:
+        - restore_run_files ./stateA1 stateA1
+        - ls -lah ./stateA1/file.txt
+        - restore_run_files ./stateA1 stateA1
+        - ls -lah ./stateA1/file.txt
+  
+  - name: approve_sanity
+    configuration:
+      inputSteps:
+        - name: stepB
+      inputResources:
+        - name: this_repo
+        - name: run_state_parallel
+      integrations:
+        - name: sanity_platform
+    type: Bash
+    execution:
+      onExecute:
+        - pushd ${res_this_repo_resourcePath}/scripts
+        - npm ci
+        - export API_URL="${int_sanity_platform_url}/pipelines/api/v1"
+        - export API_TOKEN="Bearer ${int_sanity_platform_accessToken}"
+        - node index.js sanityGate --stepName $qualityGateStep --runId $triggerRunId --approved --comment "approved all tests passed"
+
+  - name: reject_sanity
+    configuration:
+      inputSteps:
+        - name: stepB
+          status:
+            - "failure"
+            - "error"
+            - "skipped"
+            - "cancelled"
+            - "timeout"
+      inputResources:
+        - name: this_repo
+        - name: run_state_parallel
+      integrations:
+        - name: sanity_platform
+    type: Bash
+    execution:
+      onExecute:
+        - pushd ${res_this_repo_resourcePath}/scripts
+        - npm ci
+        - export API_URL="${int_sanity_platform_url}/pipelines/api/v1"
+        - export API_TOKEN="Bearer ${int_sanity_platform_accessToken}"
+        - node index.js sanityGate --stepName $qualityGateStep --runId $triggerRunId --comment "rejected because few of the tests failed"

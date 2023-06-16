@@ -8,10 +8,22 @@ pipelines:
           - name: state_sanity
         outputResources:
           - name: run_variables
+          - name: run_state
+          - name: step_state
+          - name: pipeline_state
       execution:
         onStart: 
           - write_output run_variables "triggerRunId=${run_id}"
           - write_output run_variables "qualityGateStep=run_variables_gate"
+
+          - write_output run_state "triggerRunId=${run_id}"
+          - write_output run_state "qualityGateStep=run_state_gate"
+
+          - write_output step_state "triggerRunId=${run_id}"
+          - write_output step_state "qualityGateStep=step_state_gate"
+
+          - write_output pipeline_state "triggerRunId=${run_id}"
+          - write_output pipeline_state "qualityGateStep=pipeline_state_gate"
   
     - name: run_variables_gate
       type: Bash
@@ -23,10 +35,46 @@ pipelines:
         onExecute:
           - echo "Basic run variables done"
 
+    - name: step_state_gate
+      type: Bash
+      configuration:
+        requiresApproval: true
+        inputResources:
+          - name: step_state
+      execution:
+        onExecute:
+          - echo "Basic step_state  done"
+
+
+    - name: run_state_gate
+      type: Bash
+      configuration:
+        requiresApproval: true
+        inputResources:
+          - name: run_state
+      execution:
+        onExecute:
+          - echo "Basic run_state  done"
+
+
+    - name: pipeline_state_gate
+      type: Bash
+      configuration:
+        requiresApproval: true
+        inputResources:
+          - name: pipeline_state
+      execution:
+        onExecute:
+          - echo "Basic pipeline_state  done"
+
     - name: approve_sanity
       configuration:
+        affinityGroup: sanity
         inputSteps:
           - name: run_variables_gate
+          - name: step_state_gate
+          - name: pipeline_state_gate
+          - name: run_state_gate
         inputResources:
           - name: this_repo
           - name: state_sanity
@@ -40,17 +88,13 @@ pipelines:
           - export API_URL="${int_sanity_platform_url}/pipelines/api/v1"
           - export API_TOKEN="Bearer ${int_sanity_platform_accessToken}"
           - node index.js sanityGate --stepName $qualityGateStep --runId $triggerRunId --approved --comment "approved all tests passed"
+          - add_run_variables "approved=true"
 
     - name: reject_sanity
       configuration:
+        affinityGroup: sanity
         inputSteps:
-          - name: run_variables_gate
-            status:
-              - "failure"
-              - "error"
-              - "skipped"
-              - "cancelled"
-              - "timeout"
+          - name: approve_sanity
         inputResources:
           - name: this_repo
           - name: state_sanity
@@ -59,6 +103,7 @@ pipelines:
       type: Bash
       execution:
         onExecute:
+          - if [[ ${approved} = "true" ]]; then exit 0; fi;
           - pushd ${res_this_repo_resourcePath}/scripts
           - npm ci
           - export API_URL="${int_sanity_platform_url}/pipelines/api/v1"

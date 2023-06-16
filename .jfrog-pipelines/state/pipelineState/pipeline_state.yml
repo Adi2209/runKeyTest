@@ -1,0 +1,63 @@
+pipelines:
+- name: Sanity_test_pipeline_state
+  steps:
+  - name: stepA1
+    type: Bash
+    configuration:
+      inputResources:
+        - name: pipeline_state
+    execution:
+      onExecute:
+        - | 
+          if [[ $run_number -gt 1 ]]; then
+            restore_pipeline_files cache ./cache
+            ls -latr ./cache/file$(($run_number - 1))
+            echo "working" > cache/file${run_number}.txt
+            add_pipeline_files ./cache cache
+          else
+            mkdir -p cache
+            echo "working" > cache/file0.txt
+            add_pipeline_files ./cache cache
+          fi
+ 
+  - name: approve_sanity
+    configuration:
+      inputSteps:
+        - name: stepA1
+      inputResources:
+        - name: this_repo
+        - name: step_state
+      integrations:
+        - name: sanity_platform
+    type: Bash
+    execution:
+      onExecute:
+        - pushd ${res_this_repo_resourcePath}/scripts
+        - npm ci
+        - export API_URL="${int_sanity_platform_url}/pipelines/api/v1"
+        - export API_TOKEN="Bearer ${int_sanity_platform_accessToken}"
+        - node index.js sanityGate --stepName $qualityGateStep --runId $triggerRunId --approved --comment "approved all tests passed"
+
+  - name: reject_sanity
+    configuration:
+      inputSteps:
+        - name: stepA1
+          status:
+            - "failure"
+            - "error"
+            - "skipped"
+            - "cancelled"
+            - "timeout"
+      inputResources:
+        - name: this_repo
+        - name: step_state
+      integrations:
+        - name: sanity_platform
+    type: Bash
+    execution:
+      onExecute:
+        - pushd ${res_this_repo_resourcePath}/scripts
+        - npm ci
+        - export API_URL="${int_sanity_platform_url}/pipelines/api/v1"
+        - export API_TOKEN="Bearer ${int_sanity_platform_accessToken}"
+        - node index.js sanityGate --stepName $qualityGateStep --runId $triggerRunId --comment "rejected because few of the tests failed"

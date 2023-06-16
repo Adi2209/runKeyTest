@@ -12,8 +12,10 @@ pipelines:
         onStart: 
           - write_output basic_sanity "triggerRunId=${run_id}"
           - write_output basic_sanity "qualityGateStep=basic_sanity_gate"
+          
           - write_output state_sanity "triggerRunId=${run_id}"
           - write_output state_sanity "qualityGateStep=state_sanity_gate"
+
           - write_output step_workflow_sanity "triggerRunId=${run_id}"
           - write_output step_workflow_sanity "qualityGateStep=step_workflow_sanity_gate"
   

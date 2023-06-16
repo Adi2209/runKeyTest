@@ -1,0 +1,9 @@
+resources:
+  - name: run_variables
+    type: PropertyBag
+    configuration:
+      key: value
+  - name: step_state
+    type: PropertyBag
+    configuration:
+      key: value
