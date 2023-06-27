@@ -25,7 +25,7 @@ pipelines:
             - timeout
     execution:
       onExecute:
-        - restore_run_files ./stateA1 stateA1
+        - restore_run_files stateA1 ./stateA1
         - echo "working 2" > ./stateA1/file2.txt
         - add_run_files ./stateA1 stateA1
     
@@ -36,7 +36,7 @@ pipelines:
         - name: stepA2
     execution:
       onExecute:
-        - restore_run_files ./stateA1 stateA1
+        - restore_run_files stateA1 ./stateA1
         - ls -lah ./stateA1/file.txt
         - ls -lah ./stateA1/file2.txt
   
