@@ -14,6 +14,9 @@ pipelines:
   
   - name: stepA2
     type: Bash
+    configuration:
+      inputResources:
+        - name: run_state_series_parallel
     execution:
       onExecute:
         - mkdir -p stateA2
