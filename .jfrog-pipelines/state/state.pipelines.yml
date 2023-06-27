@@ -66,15 +66,24 @@ pipelines:
       execution:
         onExecute:
           - echo "Basic pipeline_state  done"
-
-    - name: approve_sanity
+  
+    - name: check_sanity
+      type: Bash
       configuration:
-        affinityGroup: sanity
         inputSteps:
           - name: run_variables_gate
           - name: step_state_gate
           - name: pipeline_state_gate
           - name: run_state_gate
+      execution:
+        onExecute:
+            - echo "Basic pipeline_state  done"
+
+    - name: approve_sanity
+      configuration:
+        affinityGroup: sanity
+        inputSteps:
+          - name: check_sanity
         inputResources:
           - name: this_repo
           - name: state_sanity
@@ -94,7 +103,13 @@ pipelines:
       configuration:
         affinityGroup: sanity
         inputSteps:
-          - name: approve_sanity
+          - name: check_sanity
+            status:
+              - "failure"
+              - "error"
+              - "skipped"
+              - "cancelled"
+              - "timeout"
         inputResources:
           - name: this_repo
           - name: state_sanity

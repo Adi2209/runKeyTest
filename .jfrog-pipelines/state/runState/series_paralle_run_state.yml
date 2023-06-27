@@ -34,7 +34,7 @@ pipelines:
         - restore_run_files stateA1 ./stateA1
         - restore_run_files stateA2 ./stateA2
         - ls -lah ./stateA1/file.txt
-        - ls -lah ./stateA1/file2.txt
+        - ls -lah ./stateA2/file2.txt
   
   - name: approve_sanity
     configuration:
