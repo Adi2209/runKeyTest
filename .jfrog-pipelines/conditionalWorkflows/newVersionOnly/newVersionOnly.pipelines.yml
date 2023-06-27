@@ -11,7 +11,7 @@ pipelines:
             - name: shouldNotUpdateBag
         execution:
           onExecute:
-            - write_output shouldUpdateBag "updated=true"
+            - write_output shouldUpdateBag "updated=true" "runId=${run_id}"
       
       - name: New_Version_Pipeline
         type: Bash
