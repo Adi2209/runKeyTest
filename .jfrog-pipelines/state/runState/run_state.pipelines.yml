@@ -18,7 +18,7 @@ pipelines:
           - write_output run_state_series_parallel "triggerRunId=${run_id}"
           - write_output run_state_series_parallel "qualityGateStep=run_state_series_parallel_gate"
   
-          - write_output run_state_series_parallel "triggerRunId=${run_id}"
+          - write_output run_state_series "triggerRunId=${run_id}"
           - write_output run_state_series "qualityGateStep=run_state_series_gate"
   
     - name: run_state_parallel_gate

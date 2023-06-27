@@ -12,7 +12,6 @@ pipelines:
         - mkdir -p stateA1
         - echo "working" > ./stateA1/file.txt
         - add_run_files ./stateA1 stateA1
-        - sleep 30s
   
   - name: stepA2
     type: Bash
