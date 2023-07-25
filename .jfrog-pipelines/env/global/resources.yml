@@ -1,5 +1,5 @@
 resources:
-  - name: auto_runtime_sanity
+  - name: env_sanity
     type: PropertyBag
     configuration:
-      key: runtime_sanity
+      key: env_sanity
