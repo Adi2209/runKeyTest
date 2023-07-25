@@ -1,0 +1,66 @@
+pipelines:
+  - name: adityan_env_pipeline
+    configuration:
+      environmentVariables:
+        readOnly:
+          env1: pipe_value1
+          env2: pipe_value2
+          env3: pipe_value3
+    steps:
+      - name: environment_variable_step1
+        type: Bash
+        configuration:
+          environmentVariables:
+            key1: val1
+            key2: val2
+            key3: val3
+        execution:
+          onExecute:
+            - echo $env1
+            - echo $env2
+            - echo $env3
+            - echo $key1
+            - echo $key2
+            - echo $key3
+      
+      - name: approve_sanity
+        type: Bash
+        configuration:
+          inputSteps:
+            - name: environment_variable_step1
+          inputResources:
+            - name: this_repo
+            - name: env_sanity
+          integrations:
+            - name: sanity_platform
+        execution:
+          onExecute:
+            - pushd ${res_this_repo_resourcePath}/scripts
+            - npm ci
+            - export API_URL="${int_sanity_platform_url}/pipelines/api/v1"
+            - export API_TOKEN="Bearer ${int_sanity_platform_accessToken}"
+            - node index.js sanityGate --stepName $qualityGateStep --runId $triggerRunId --approved --comment "approved all tests passed"
+
+      - name: reject_sanity
+        type: Bash
+        configuration:
+          inputSteps:
+            - name: approve_sanity
+              status:
+                - failure
+                - skipped
+                - timeout
+                - error
+                - cancelled
+          inputResources:
+            - name: this_repo
+            - name: env_sanity
+          integrations:
+            - name: sanity_platform
+        execution:
+          onExecute:
+            - pushd ${res_this_repo_resourcePath}/scripts
+            - npm ci
+            - export API_URL="${int_sanity_platform_url}/pipelines/api/v1"
+            - export API_TOKEN="Bearer ${int_sanity_platform_accessToken}"
+            - node index.js sanityGate --stepName $qualityGateStep --runId $triggerRunId --comment "rejected because few of the tests failed"
