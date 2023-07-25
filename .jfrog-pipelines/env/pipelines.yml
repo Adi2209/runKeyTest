@@ -22,22 +22,22 @@ pipelines:
           - echo "Basic sanity done"
 
     - name: approve_sanity
-        type: Bash
-        configuration:
-          inputSteps:
-            - name: environment_variable_step1
-          inputResources:
-            - name: this_repo
-            - name: env_sanity
-          integrations:
-            - name: sanity_platform
-        execution:
-          onExecute:
-            - pushd ${res_this_repo_resourcePath}/scripts
-            - npm ci
-            - export API_URL="${int_sanity_platform_url}/pipelines/api/v1"
-            - export API_TOKEN="Bearer ${int_sanity_platform_accessToken}"
-            - node index.js sanityGate --stepName $qualityGateStep --runId $triggerRunId --approved --comment "approved all tests passed"
+      type: Bash
+      configuration:
+        inputSteps:
+          - name: environment_variable_step1
+        inputResources:
+          - name: this_repo
+          - name: env_sanity
+        integrations:
+          - name: sanity_platform
+      execution:
+        onExecute:
+          - pushd ${res_this_repo_resourcePath}/scripts
+          - npm ci
+          - export API_URL="${int_sanity_platform_url}/pipelines/api/v1"
+          - export API_TOKEN="Bearer ${int_sanity_platform_accessToken}"
+          - node index.js sanityGate --stepName $qualityGateStep --runId $triggerRunId --approved --comment "approved all tests passed"
 
       - name: reject_sanity
         type: Bash
