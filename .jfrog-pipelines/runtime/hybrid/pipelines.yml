@@ -102,7 +102,7 @@ pipelines:
         type: Bash
         configuration: 
           inputResources:
-            - name: mySecondRepo
+            - name: this_repo
           inputSteps: 
             - name: step_r_hyb_s3
             - name: step_r_hyb_s5
