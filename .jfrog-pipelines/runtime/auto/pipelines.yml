@@ -5,23 +5,23 @@ resources:
       foo: bar
       foo1: bar1
       foo2: bar2
-  - name: step_r_1
+  - name: step_r_1_a
     type: PropertyBag
     configuration:
       key: value
-  - name: step_r_2
+  - name: step_r_2_a
     type: PropertyBag
     configuration:
       key: value
-  - name: step_r_3
+  - name: step_r_3_a
     type: PropertyBag
     configuration:
       key: value
-  - name: step_r_4
+  - name: step_r_4_a
     type: PropertyBag
     configuration:
       key: value
-  - name: step_r_5
+  - name: step_r_5_a
     type: PropertyBag
     configuration:
       key: value
@@ -38,7 +38,7 @@ pipelines:
             versions:
                       - "14"
     steps: #step_r definiton
-      - name: step_r_1
+      - name: step_r_1_a
         type: Bash
         configuration:
           inputResources:
@@ -48,70 +48,68 @@ pipelines:
           onExecute:
             - printenv
             - node -v
-      - name: step_r_2
+      - name: step_r_2_a
         type: Bash
         configuration:
           affinityGroup: ag1
           inputSteps: 
-            - name: step_r_1
+            - name: step_r_1_a
         execution:
           onExecute:
-            - echo "Executed step_r_1_1"
+            - echo "Executed step_r_1_a_1"
             - node -v
-      - name: step_r_3
+      - name: step_r_3_a
         type: Bash
         configuration: 
           inputSteps: 
-            - name: step_r_2
+            - name: step_r_2_a
         execution:
           onExecute:
-            - echo "Executed step_r_1_2"
+            - echo "Executed step_r_1_a_2"
             - node -v
-      - name: step_r_4
+      - name: step_r_4_a
         type: Bash
         configuration: 
           timeoutSeconds: 1
           priority: 2
           inputSteps: 
-            - name: step_r_2
+            - name: step_r_2_a
         execution:
           onExecute:
             - sleep 3
             - node -v
           onFailure:
             - echo "Timed Out"
-      - name: step_r_5
+      - name: step_r_5_a
         type: Bash
         configuration: 
           priority: 1
           inputSteps: 
-            - name: step_r_2
+            - name: step_r_2_a
         execution:
           onExecute:
-            - echo "Executed step_r_1_5"
+            - echo "Executed step_r_1_a_5"
             - node -v
       - name: step_r_6
         type: Bash
         configuration: 
           inputSteps: 
-            - name: step_r_3
-            - name: step_r_5
-            - name: step_r_4
+            - name: step_r_3_a
+            - name: step_r_5_a
+            - name: step_r_4_a
         execution:
           onExecute:
-            - echo "Executed step_r_1_6"
+            - echo "Executed step_r_1_a_6"
       - name: step_r_7
         type: Bash
         configuration: 
-          inputResources:
-            - name: mySecondRepo
           inputSteps: 
-            - name: step_r_3
-            - name: step_r_5
+            - name: step_r_3_a
+            - name: step_r_5_a
             - name: step_r_6
         execution:
           onExecute:
-            - echo "Executed step_r_1_7"
+            - echo "Executed step_r_1_a_7"
             - node -v
           onSuccess:
             - echo "Executed Successfully"
