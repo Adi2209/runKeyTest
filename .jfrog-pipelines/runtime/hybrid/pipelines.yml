@@ -101,8 +101,8 @@ pipelines:
       - name: step_r_hyb_s7
         type: Bash
         configuration: 
-          # inputResources:
-            # - name: this_repo
+          inputResources:
+            - name: this_repo
           inputSteps: 
             - name: step_r_hyb_s3
             - name: step_r_hyb_s5
@@ -120,7 +120,7 @@ pipelines:
           inputSteps:
             - name: step_r_hyb_s7
           inputResources:
-            # - name: this_repo
+            - name: this_repo
             - name: hybrid_runtime_sanity
           integrations:
             - name: sanity_platform
@@ -144,7 +144,7 @@ pipelines:
                 - error
                 - cancelled
           inputResources:
-            # - name: this_repo
+            - name: this_repo
             - name: hybrid_runtime_sanity
           integrations:
             - name: sanity_platform
