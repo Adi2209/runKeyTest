@@ -24,8 +24,6 @@ pipelines:
     - name: approve_sanity
       type: Bash
       configuration:
-        inputSteps:
-          - name: environment_variable_step1
         inputResources:  
           - name: this_repo
           - name: env_sanity
