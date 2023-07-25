@@ -1,0 +1,160 @@
+resources:
+  - name: propertyBag_runtime
+    type: PropertyBag
+    configuration:
+      foo: bar
+      foo1: bar1
+      foo2: bar2
+  - name: step_r_1
+    type: PropertyBag
+    configuration:
+      key: value
+  - name: step_r_2
+    type: PropertyBag
+    configuration:
+      key: value
+  - name: step_r_3
+    type: PropertyBag
+    configuration:
+      key: value
+  - name: step_r_4
+    type: PropertyBag
+    configuration:
+      key: value
+  - name: step_r_5
+    type: PropertyBag
+    configuration:
+      key: value
+
+pipelines:
+  - name: pipeline_runtime_auto_adityan
+    configuration:
+      runtime: 
+        type: image
+        image: 
+          auto:
+            language: node
+            version: "14"
+            versions:
+                      - "14"
+    steps: #step_r definiton
+      - name: step_r_1
+        type: Bash
+        configuration:
+          inputResources:
+            - name: auto_runtime_sanity
+          affinityGroup: ag1
+        execution:
+          onExecute:
+            - printenv
+            - node -v
+      - name: step_r_2
+        type: Bash
+        configuration:
+          affinityGroup: ag1
+          inputSteps: 
+            - name: step_r_1
+        execution:
+          onExecute:
+            - echo "Executed step_r_1_1"
+            - node -v
+      - name: step_r_3
+        type: Bash
+        configuration: 
+          inputSteps: 
+            - name: step_r_2
+        execution:
+          onExecute:
+            - echo "Executed step_r_1_2"
+            - node -v
+      - name: step_r_4
+        type: Bash
+        configuration: 
+          timeoutSeconds: 1
+          priority: 2
+          inputSteps: 
+            - name: step_r_2
+        execution:
+          onExecute:
+            - sleep 3
+            - node -v
+          onFailure:
+            - echo "Timed Out"
+      - name: step_r_5
+        type: Bash
+        configuration: 
+          priority: 1
+          inputSteps: 
+            - name: step_r_2
+        execution:
+          onExecute:
+            - echo "Executed step_r_1_5"
+            - node -v
+      - name: step_r_6
+        type: Bash
+        configuration: 
+          inputSteps: 
+            - name: step_r_3
+            - name: step_r_5
+            - name: step_r_4
+        execution:
+          onExecute:
+            - echo "Executed step_r_1_6"
+      - name: step_r_7
+        type: Bash
+        configuration: 
+          inputResources:
+            - name: mySecondRepo
+          inputSteps: 
+            - name: step_r_3
+            - name: step_r_5
+            - name: step_r_6
+        execution:
+          onExecute:
+            - echo "Executed step_r_1_7"
+            - node -v
+          onSuccess:
+            - echo "Executed Successfully"
+
+      
+      - name: approve_sanity
+        type: Bash
+        configuration:
+          inputSteps:
+            - name: step_r_7
+          inputResources:
+            - name: this_repo
+            - name: auto_runtime_sanity
+          integrations:
+            - name: sanity_platform
+        execution:
+          onExecute:
+            - pushd ${res_this_repo_resourcePath}/scripts
+            - npm ci
+            - export API_URL="${int_sanity_platform_url}/pipelines/api/v1"
+            - export API_TOKEN="Bearer ${int_sanity_platform_accessToken}"
+            - node index.js sanityGate --stepName $qualityGateStep --runId $triggerRunId --approved --comment "approved all tests passed"
+
+      - name: reject_sanity
+        type: Bash
+        configuration:
+          inputSteps:
+            - name: approve_sanity
+              status:
+                - failure
+                - skipped
+                - timeout
+                - error
+                - cancelled
+          inputResources:
+            - name: this_repo
+            - name: auto_runtime_sanity
+          integrations:
+            - name: sanity_platform
+        execution:
+          onExecute:
+            - pushd ${res_this_repo_resourcePath}/scripts
+            - npm ci
+            - export API_URL="${int_sanity_platform_url}/pipelines/api/v1"
+            - export API_TOKEN="Bearer ${int_sanity_platform_accessToken}"
+            - node index.js sanityGate --stepName $qualityGateStep --runId $triggerRunId --comment "rejected because few of the tests failed"

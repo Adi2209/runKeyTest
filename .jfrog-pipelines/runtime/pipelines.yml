@@ -1,0 +1,113 @@
+pipelines:
+  - name: Sanity_runtime_Trigger
+    steps:
+    - name: trigger
+      type: Bash
+      configuration:
+        inputResources:
+          - name: runtime_sanity
+        outputResources:
+          - name: auto_runtime_sanity
+          # - name: custom_runtime_sanity
+          # - name: host_runtime_sanity
+          # - name: hybrid_runtime_sanity
+      execution:
+        onStart: 
+          - write_output auto_runtime_sanity "triggerRunId=${run_id}"
+          - write_output auto_runtime_sanity "qualityGateStep=auto_runtime_sanity_gate"
+
+          # - write_output custom_runtime_sanity "triggerRunId=${run_id}"
+          # - write_output custom_runtime_sanity "qualityGateStep=custom_runtime_sanity_gate"
+
+          # - write_output host_runtime_sanity "triggerRunId=${run_id}"
+          # - write_output host_runtime_sanity "qualityGateStep=host_runtime_sanity_gate"
+
+          # - write_output hybrid_runtime_sanity "triggerRunId=${run_id}"
+          # - write_output hybrid_runtime_sanity "qualityGateStep=hybrid_runtime_sanity_gate"
+
+  
+    - name: auto_runtime_sanity_gate
+      type: Bash
+      configuration:
+        requiresApproval: true
+        inputResources:
+          - name: auto_runtime_sanity
+      execution:
+        onExecute:
+          - echo "auto_runtime_sanity_gate done"
+
+    # - name: custom_runtime_sanity_gate
+    #   type: Bash
+    #   configuration:
+    #     requiresApproval: true
+    #     inputResources:
+    #       - name: custom_runtime_sanity
+    #   execution:
+    #     onExecute:
+    #       - echo "custom_runtime_sanity_gate done"
+
+    # - name: host_runtime_sanity
+    #   type: Bash
+    #   configuration:
+    #     requiresApproval: true
+    #     inputResources:
+    #       - name: host_runtime_sanity_gate
+    #   execution:
+    #     onExecute:
+    #       - echo "host_runtime_sanity done"
+
+    # - name: hybrid_runtime_sanity_gate
+    #   type: Bash
+    #   configuration:
+    #     requiresApproval: true
+    #     inputResources:
+    #       - name: hybrid_runtime_sanity
+    #   execution:
+    #     onExecute:
+    #       - echo "hybrid_runtime_sanity_gate done"
+
+
+    - name: approve_runtime_sanity
+      configuration:
+        inputSteps:
+          - name: auto_runtime_sanity_gate
+          # - name: host_runtime_sanity_gate
+          # - name: custom_runtime_sanity_gate
+          # - name: hybrid_runtime_sanity_gate
+        inputResources:
+          - name: this_repo
+          - name: runtime_sanity
+        integrations:
+          - name: sanity_platform
+      type: Bash
+      execution:
+        onExecute:
+          - pushd ${res_this_repo_resourcePath}/scripts
+          - npm ci
+          - export API_URL="${int_sanity_platform_url}/pipelines/api/v1"
+          - export API_TOKEN="Bearer ${int_sanity_platform_accessToken}"
+          - node index.js sanityGate --stepName $qualityGateStep --runId $triggerRunId --approved --comment "approved all tests passed"
+
+    - name: reject_sanity
+      configuration:
+        inputSteps:
+          - name: approve_runtime_sanity
+            status:
+              - "failure"
+              - "error"
+              - "skipped"
+              - "cancelled"
+              - "timeout"
+        inputResources:
+          - name: this_repo
+          - name: runtime_sanity
+        integrations:
+          - name: sanity_platform
+      type: Bash
+      execution:
+        onExecute:
+          - pushd ${res_this_repo_resourcePath}/scripts
+          - npm ci
+          - export API_URL="${int_sanity_platform_url}/pipelines/api/v1"
+          - export API_TOKEN="Bearer ${int_sanity_platform_accessToken}"
+          - node index.js sanityGate --stepName $qualityGateStep --runId $triggerRunId --comment "rejected because few of the tests failed"
