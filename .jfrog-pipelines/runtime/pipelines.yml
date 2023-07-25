@@ -1,5 +1,5 @@
 pipelines:
-  - name: Sanity_runtime_Trigger_adityan
+  - name: Sanity_runtime_Trigger
     steps:
     - name: trigger
       type: Bash
@@ -8,9 +8,9 @@ pipelines:
           - name: runtime_sanity
         outputResources:
           - name: runtime_auto_sanity
-          - name: host_runtime_sanity
-          - name: hybrid_runtime_sanity
           - name: custom_runtime_sanity
+          - name: hybrid_runtime_sanity
+          - name: host_runtime_sanity
       execution:
         onStart: 
           - write_output runtime_auto_sanity "triggerRunId=${run_id}"
