@@ -5,23 +5,23 @@ resources:
       foo: bar
       foo1: bar1
       foo2: bar2
-  - name: step_r_c_1
+  - name: step_r_c_s1
     type: PropertyBag
     configuration:
       key: value
-  - name: step_r_c_2
+  - name: step_r_c_s2
     type: PropertyBag
     configuration:
       key: value
-  - name: step_r_c_3
+  - name: step_r_c_s3
     type: PropertyBag
     configuration:
       key: value
-  - name: step_r_c_4
+  - name: step_r_c_s4
     type: PropertyBag
     configuration:
       key: value
-  - name: step_r_c_5
+  - name: step_r_c_s5
     type: PropertyBag
     configuration:
       key: value
@@ -38,7 +38,7 @@ pipelines:
             registry: aditya_ent
             sourceRepository: dev-releases-docker-local
     steps: #step_r_c definiton
-      - name: step_r_c_1
+      - name: step_r_c_s1
         type: Bash
         configuration:
           affinityGroup: ag1
@@ -48,70 +48,70 @@ pipelines:
           onExecute:
             - printenv
             - echo "step executed"
-      - name: step_r_c_2
+      - name: step_r_c_s2
         type: Bash
         configuration:
           affinityGroup: ag1
           inputSteps: 
-            - name: step_r_c_1
+            - name: step_r_c_s1
         execution:
           onExecute:
-            - echo "Executed step_r_c_1_1"
+            - echo "Executed step_r_c_s1_1"
             - echo "step executed"
-      - name: step_r_c_3
+      - name: step_r_c_s3
         type: Bash
         configuration: 
           inputSteps: 
-            - name: step_r_c_2
+            - name: step_r_c_s2
         execution:
           onExecute:
-            - echo "Executed step_r_c_1_2"
+            - echo "Executed step_r_c_s1_2"
             - echo "step executed"
-      - name: step_r_c_4
+      - name: step_r_c_s4
         type: Bash
         configuration: 
           timeoutSeconds: 1
           priority: 2
           inputSteps: 
-            - name: step_r_c_2
+            - name: step_r_c_s2
         execution:
           onExecute:
             - sleep 61
             - echo "step executed"
           onFailure:
             - echo "Timed Out"
-      - name: step_r_c_5
+      - name: step_r_c_s5
         type: Bash
         configuration: 
           priority: 1
           inputSteps: 
-            - name: step_r_c_2
+            - name: step_r_c_s2
         execution:
           onExecute:
-            - echo "Executed step_r_c_1_5"
+            - echo "Executed step_r_c_s1_5"
             - echo "step executed"
-      - name: step_r_c_6
+      - name: step_r_c_s6
         type: Bash
         configuration: 
           inputSteps: 
-            - name: step_r_c_3
-            - name: step_r_c_5
-            - name: step_r_c_4
+            - name: step_r_c_s3
+            - name: step_r_c_s5
+            - name: step_r_c_s4
         execution:
           onExecute:
-            - echo "Executed step_r_c_1_6"
-      - name: step_r_c_7
+            - echo "Executed step_r_c_s1_6"
+      - name: step_r_c_s7
         type: Bash
         configuration: 
           inputResources:
             - name: mySecondRepo
           inputSteps: 
-            - name: step_r_c_3
-            - name: step_r_c_5
-            - name: step_r_c_6
+            - name: step_r_c_s3
+            - name: step_r_c_s5
+            - name: step_r_c_s6
         execution:
           onExecute:
-            - echo "Executed step_r_c_1_7"
+            - echo "Executed step_r_c_s1_7"
             - echo "step executed"
           onSuccess:
             - echo "Executed Successfully"
