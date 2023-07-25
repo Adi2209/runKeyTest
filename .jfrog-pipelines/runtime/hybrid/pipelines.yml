@@ -5,23 +5,23 @@ resources:
       foo: bar
       foo1: bar1
       foo2: bar2
-  - name: step_r_h_s1
+  - name: step_r_hyb_s1
     type: PropertyBag
     configuration:
       key: value
-  - name: step_r_h_s2
+  - name: step_r_hyb_s2
     type: PropertyBag
     configuration:
       key: value
-  - name: step_r_h_s3
+  - name: step_r_hyb_s3
     type: PropertyBag
     configuration:
       key: value
-  - name: step_r_h_s4
+  - name: step_r_hyb_s4
     type: PropertyBag
     configuration:
       key: value
-  - name: step_r_h_s5
+  - name: step_r_hyb_s5
     type: PropertyBag
     configuration:
       key: value
@@ -37,8 +37,8 @@ pipelines:
             tag: latest
             registry: aditya_ent
             sourceRepository: dev-releases-docker-local
-    steps: #step_r_h definiton
-      - name: step_r_h_s1
+    steps: #step_r_hyb definiton
+      - name: step_r_hyb_s1
         type: Bash
         configuration:
           affinityGroup: ag1
@@ -48,68 +48,68 @@ pipelines:
           onExecute:
             - printenv
             - echo "step executed"
-      - name: step_r_h_s2
+      - name: step_r_hyb_s2
         type: Bash
         configuration:
           affinityGroup: ag1
           inputSteps: 
-            - name: step_r_h_s1
+            - name: step_r_hyb_s1
         execution:
           onExecute:
-            - echo "Executed step_r_h_s1_1"
+            - echo "Executed step_r_hyb_s1_1"
             - echo "step executed"
-      - name: step_r_h_s3
+      - name: step_r_hyb_s3
         type: Bash
         configuration: 
           inputSteps: 
-            - name: step_r_h_s2
+            - name: step_r_hyb_s2
         execution:
           onExecute:
-            - echo "Executed step_r_h_s1_2"
+            - echo "Executed step_r_hyb_s1_2"
             - echo "step executed"
-      - name: step_r_h_s4
+      - name: step_r_hyb_s4
         type: Bash
         configuration: 
           priority: 2
           inputSteps: 
-            - name: step_r_h_s2
+            - name: step_r_hyb_s2
         execution:
           onExecute:
             - echo "step executed"
           onFailure:
             - echo "Timed Out"
-      - name: step_r_h_s5
+      - name: step_r_hyb_s5
         type: Bash
         configuration: 
           priority: 1
           inputSteps: 
-            - name: step_r_h_s2
+            - name: step_r_hyb_s2
         execution:
           onExecute:
-            - echo "Executed step_r_h_s1_5"
+            - echo "Executed step_r_hyb_s1_5"
             - echo "step executed"
-      - name: step_r_h_s6
+      - name: step_r_hyb_s6
         type: Bash
         configuration: 
           inputSteps: 
-            - name: step_r_h_s3
-            - name: step_r_h_s5
-            - name: step_r_h_s4
+            - name: step_r_hyb_s3
+            - name: step_r_hyb_s5
+            - name: step_r_hyb_s4
         execution:
           onExecute:
-            - echo "Executed step_r_h_s1_6"
-      - name: step_r_h_s7
+            - echo "Executed step_r_hyb_s1_6"
+      - name: step_r_hyb_s7
         type: Bash
         configuration: 
           inputResources:
             - name: mySecondRepo
           inputSteps: 
-            - name: step_r_h_s3
-            - name: step_r_h_s5
-            - name: step_r_h_s6
+            - name: step_r_hyb_s3
+            - name: step_r_hyb_s5
+            - name: step_r_hyb_s6
         execution:
           onExecute:
-            - echo "Executed step_r_h_s1_7"
+            - echo "Executed step_r_hyb_s1_7"
             - echo "step executed"
           onSuccess:
             - echo "Executed Successfully"
@@ -118,7 +118,7 @@ pipelines:
         type: Bash
         configuration:
           inputSteps:
-            - name: step_r_h_s7
+            - name: step_r_hyb_s7
           inputResources:
             - name: this_repo
             - name: hybrid_runtime_sanity
