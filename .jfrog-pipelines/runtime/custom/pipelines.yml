@@ -120,7 +120,7 @@ pipelines:
         type: Bash
         configuration:
           inputSteps:
-            - name: step_r_7
+            - name: step_r_c_s7
           inputResources:
             - name: this_repo
             - name: custom_runtime_sanity
