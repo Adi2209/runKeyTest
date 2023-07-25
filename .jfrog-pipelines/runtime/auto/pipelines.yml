@@ -1,5 +1,5 @@
 resources:
-  - name: propertyBag_runtime
+  - name: propertyBag_runtime_a
     type: PropertyBag
     configuration:
       foo: bar
