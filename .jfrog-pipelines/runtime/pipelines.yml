@@ -9,8 +9,7 @@ pipelines:
         outputResources:
           - name: auto_runtime_sanity
           - name: custom_runtime_sanity
-          # - name: host_runtime_sanity
-          # - name: hybrid_runtime_sanity
+          - name: hybrid_runtime_sanity
       execution:
         onStart: 
           - write_output auto_runtime_sanity "triggerRunId=${run_id}"
@@ -19,11 +18,8 @@ pipelines:
           - write_output custom_runtime_sanity "triggerRunId=${run_id}"
           - write_output custom_runtime_sanity "qualityGateStep=custom_runtime_sanity_gate"
 
-          # - write_output host_runtime_sanity "triggerRunId=${run_id}"
-          # - write_output host_runtime_sanity "qualityGateStep=host_runtime_sanity_gate"
-
-          # - write_output hybrid_runtime_sanity "triggerRunId=${run_id}"
-          # - write_output hybrid_runtime_sanity "qualityGateStep=hybrid_runtime_sanity_gate"
+          - write_output hybrid_runtime_sanity "triggerRunId=${run_id}"
+          - write_output hybrid_runtime_sanity "qualityGateStep=hybrid_runtime_sanity_gate"
 
   
     - name: auto_runtime_sanity_gate
@@ -46,34 +42,23 @@ pipelines:
         onExecute:
           - echo "custom_runtime_sanity_gate done"
 
-    # - name: host_runtime_sanity
-    #   type: Bash
-    #   configuration:
-    #     requiresApproval: true
-    #     inputResources:
-    #       - name: host_runtime_sanity_gate
-    #   execution:
-    #     onExecute:
-    #       - echo "host_runtime_sanity done"
-
-    # - name: hybrid_runtime_sanity_gate
-    #   type: Bash
-    #   configuration:
-    #     requiresApproval: true
-    #     inputResources:
-    #       - name: hybrid_runtime_sanity
-    #   execution:
-    #     onExecute:
-    #       - echo "hybrid_runtime_sanity_gate done"
+    - name: hybrid_runtime_sanity_gate
+      type: Bash
+      configuration:
+        requiresApproval: true
+        inputResources:
+          - name: hybrid_runtime_sanity
+      execution:
+        onExecute:
+          - echo "hybrid_runtime_sanity_gate done"
 
 
     - name: approve_runtime_sanity
       configuration:
         inputSteps:
           - name: auto_runtime_sanity_gate
-          # - name: host_runtime_sanity_gate
           - name: custom_runtime_sanity_gate
-          # - name: hybrid_runtime_sanity_gate
+          - name: hybrid_runtime_sanity_gate
         inputResources:
           - name: this_repo
           - name: runtime_sanity
