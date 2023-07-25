@@ -27,7 +27,7 @@ resources:
       key: value
 
 pipelines:
-  - name: pipeline_runtime_custom_adityan
+  - name: pipeline_runtime_custom_sanity_adityan
     configuration:
       runtime: 
         type: image
