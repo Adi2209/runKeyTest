@@ -70,13 +70,11 @@ pipelines:
       - name: step_r_c_s4
         type: Bash
         configuration: 
-          timeoutSeconds: 1
           priority: 2
           inputSteps: 
             - name: step_r_c_s2
         execution:
           onExecute:
-            - sleep 61
             - echo "step executed"
           onFailure:
             - echo "Timed Out"
