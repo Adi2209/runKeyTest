@@ -1,5 +1,5 @@
 pipelines:
-  - name: adityan_env_pipeline
+  - name: adityan_env_pipeline_sanity
     configuration:
       environmentVariables:
         readOnly:
