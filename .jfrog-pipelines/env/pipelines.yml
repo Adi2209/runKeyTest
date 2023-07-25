@@ -5,129 +5,61 @@ pipelines:
       type: Bash
       configuration:
         outputResources:
-          - name: state_sanity
-          - name: basic_sanity
-          - name: step_workflow_sanity
-          - name: workflow_sanity
-          - name: runtime_sanity
+          - name: env_sanity
       execution:
         onStart: 
-          - write_output basic_sanity "triggerRunId=${run_id}"
-          - write_output basic_sanity "qualityGateStep=basic_sanity_gate"
-          
-          - write_output state_sanity "triggerRunId=${run_id}"
-          - write_output state_sanity "qualityGateStep=state_sanity_gate"
-
-          - write_output step_workflow_sanity "triggerRunId=${run_id}"
-          - write_output step_workflow_sanity "qualityGateStep=step_workflow_sanity_gate"
-
-          - write_output workflow_sanity "triggerRunId=${run_id}"
-          - write_output workflow_sanity "qualityGateStep=workflow_sanity_gate"
-
-          - write_output runtime_sanity "triggerRunId=${run_id}"
-          - write_output runtime_sanity "qualityGateStep=runtime_sanity_gate"
+          - write_output env_sanity "triggerRunId=${run_id}"
+          - write_output env_sanity "qualityGateStep=env_sanity_gate"
   
-    - name: basic_sanity_gate
+    - name: env_sanity_gate
       type: Bash
       configuration:
         requiresApproval: true
         inputResources:
-          - name: basic_sanity
+          - name: env_sanity
       execution:
         onExecute:
           - echo "Basic sanity done"
 
-    - name: state_sanity_gate
-      type: Bash
-      configuration:
-        requiresApproval: true
-        inputResources:
-          - name: state_sanity
-      execution:
-        onExecute:
-          - echo "State sanity done"
-
-    - name: step_workflow_sanity_gate
-      type: Bash
-      configuration:
-        requiresApproval: true
-        inputResources:
-          - name: step_workflow_sanity
-      execution:
-        onExecute:
-          - echo "Step Workflow Sanity done"
-    
-    - name: workflow_sanity_gate
-      type: Bash
-      configuration:
-        requiresApproval: true
-        inputResources:
-          - name: workflow_sanity
-      execution:
-        onExecute:
-          - echo "Worklow sanity done"
-
-    - name: runtime_sanity_gate
-      type: Bash
-      configuration:
-        requiresApproval: true
-        inputResources:
-          - name: runtime_sanity
-      execution:
-        onExecute:
-          - echo "Basic sanity done"
-
-    - name: check_sanity
-      type: Bash
-      configuration:
-        inputSteps:
-          - name: basic_sanity_gate
-          - name: state_sanity_gate
-          - name: step_workflow_sanity_gate
-          - name: workflow_sanity_gate
-          - name: runtime_sanity_gate
-      execution:
-        onExecute:
-          - echo "All sanity done"
-
-    - name: fail_if_sanity_not_done
-      type: Bash
-      configuration:
-        inputSteps:
-          - name: check_sanity
-            status: 
-              - "skipped"
-      execution:
-        onExecute:
-          - exit 1
-      
-  - name: Sanity_Basic
-    steps:
-      - name: trigger_basic
-        type: Bash
-        configuration:
-          inputResources:
-            - name: basic_sanity
-        execution:
-          onStart:
-            - echo "triggerRunId is ${triggerRunId}"
-            - printenv
-      - name: approveStep
+    - name: approve_sanity
         type: Bash
         configuration:
           inputSteps:
-            - name: trigger_basic
+            - name: environment_variable_step1
           inputResources:
             - name: this_repo
-              trigger: false
-            - name: basic_sanity
+            - name: env_sanity
           integrations:
             - name: sanity_platform
         execution:
-          onStart:
+          onExecute:
             - pushd ${res_this_repo_resourcePath}/scripts
             - npm ci
             - export API_URL="${int_sanity_platform_url}/pipelines/api/v1"
             - export API_TOKEN="Bearer ${int_sanity_platform_accessToken}"
-            - node index.js sanityGate --stepName $qualityGateStep --runId $triggerRunId --approved --comment "approved my api"
+            - node index.js sanityGate --stepName $qualityGateStep --runId $triggerRunId --approved --comment "approved all tests passed"
+
+      - name: reject_sanity
+        type: Bash
+        configuration:
+          inputSteps:
+            - name: approve_sanity
+              status:
+                - failure
+                - skipped
+                - timeout
+                - error
+                - cancelled
+          inputResources:
+            - name: this_repo
+            - name: env_sanity
+          integrations:
+            - name: sanity_platform
+        execution:
+          onExecute:
+            - pushd ${res_this_repo_resourcePath}/scripts
+            - npm ci
+            - export API_URL="${int_sanity_platform_url}/pipelines/api/v1"
+            - export API_TOKEN="Bearer ${int_sanity_platform_accessToken}"
+            - node index.js sanityGate --stepName $qualityGateStep --runId $triggerRunId --comment "rejected because few of the tests failed"
 
