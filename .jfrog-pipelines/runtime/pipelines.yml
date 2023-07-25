@@ -10,6 +10,7 @@ pipelines:
           - name: runtime_auto_sanity
           - name: custom_runtime_sanity
           - name: hybrid_runtime_sanity
+          - name: host_runtime_sanity
       execution:
         onStart: 
           - write_output runtime_auto_sanity "triggerRunId=${run_id}"
@@ -20,6 +21,9 @@ pipelines:
 
           - write_output hybrid_runtime_sanity "triggerRunId=${run_id}"
           - write_output hybrid_runtime_sanity "qualityGateStep=hybrid_runtime_sanity_gate"
+
+          - write_output host_runtime_sanity "triggerRunId=${run_id}"
+          - write_output host_runtime_sanity "qualityGateStep=host_runtime_sanity_gate"
 
   
     - name: auto_runtime_sanity_gate
@@ -51,6 +55,16 @@ pipelines:
       execution:
         onExecute:
           - echo "hybrid_runtime_sanity_gate done"
+      
+    - name: host_runtime_sanity_gate
+      type: Bash
+      configuration:
+        requiresApproval: true
+        inputResources:
+          - name: host_runtime_sanity
+      execution:
+        onExecute:
+          - echo "host_runtime_sanity_gate done"
 
 
     - name: approve_runtime_sanity
@@ -59,6 +73,7 @@ pipelines:
           - name: auto_runtime_sanity_gate
           - name: custom_runtime_sanity_gate
           - name: hybrid_runtime_sanity_gate
+          - name: host_runtime_sanity_gate
         inputResources:
           - name: this_repo
           - name: runtime_sanity

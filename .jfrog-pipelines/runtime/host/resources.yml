@@ -1,0 +1,5 @@
+resources:
+  - name: host_runtime_sanity
+    type: PropertyBag
+    configuration:
+      key: runtime_sanity

@@ -1,5 +1,5 @@
 resources:
-  - name: propertyBag_runtime_h_sanity
+  - name: propertyBag_runtime_host_sanity
     type: PropertyBag
     configuration:
       foo: bar
@@ -27,23 +27,17 @@ resources:
       key: value
 
 pipelines:
-  - name: pipeline_runtime_hybrid_sanity_adityan
+  - name: pipeline_runtime_host_sanity_adityan
     configuration:
       runtime: 
-        type: image
-        image: 
-          custom:
-            name: jfpip.jfrog.io/jfrog/pipelines-tools
-            tag: latest
-            registry: aditya_ent
-            sourceRepository: dev-releases-docker-local
+        type: host
     steps: #step_r_h definiton
       - name: step_r_h_s1
         type: Bash
         configuration:
           affinityGroup: ag1
           inputResources:
-            - name: hybrid_runtime_sanity
+            - name: host_runtime_sanity
         execution:
           onExecute:
             - printenv
@@ -121,7 +115,7 @@ pipelines:
             - name: step_r_h_s7
           inputResources:
             - name: this_repo
-            - name: hybrid_runtime_sanity
+            - name: host_runtime_sanity
           integrations:
             - name: sanity_platform
         execution:
@@ -145,7 +139,7 @@ pipelines:
                 - cancelled
           inputResources:
             - name: this_repo
-            - name: hybrid_runtime_sanity
+            - name: host_runtime_sanity
           integrations:
             - name: sanity_platform
         execution:
