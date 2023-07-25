@@ -40,7 +40,7 @@ pipelines:
     - name: reject_sanity
       configuration:
         inputSteps:
-          - name: approve_runtime_sanity
+          - name: approve_sanity
             status:
               - "failure"
               - "error"
@@ -49,7 +49,7 @@ pipelines:
               - "timeout"
         inputResources:
           - name: this_repo
-          - name: runtime_sanity
+          - name: env_sanity
         integrations:
           - name: sanity_platform
       type: Bash
