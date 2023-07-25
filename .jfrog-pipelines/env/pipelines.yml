@@ -4,7 +4,7 @@ pipelines:
     - name: trigger
       type: Bash
       configuration:
-        outputResources:
+        inputResources:
           - name: env_sanity
       execution:
         onStart: 
