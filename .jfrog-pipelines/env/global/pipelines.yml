@@ -30,7 +30,7 @@ pipelines:
             - name: environment_variable_step1
           inputResources:
             - name: this_repo
-            - name: env_sanity
+            - name: env_global_sanity
           integrations:
             - name: sanity_platform
         execution:
@@ -54,7 +54,7 @@ pipelines:
                 - cancelled
           inputResources:
             - name: this_repo
-            - name: env_sanity
+            - name: env_global_sanity
           integrations:
             - name: sanity_platform
         execution:

@@ -1,5 +1,5 @@
 resources:
-  - name: env_sanity
+  - name: env_global_sanity
     type: PropertyBag
     configuration:
       key: env_sanity
