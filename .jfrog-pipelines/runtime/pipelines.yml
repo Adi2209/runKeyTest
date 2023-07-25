@@ -8,7 +8,7 @@ pipelines:
           - name: runtime_sanity
         outputResources:
           - name: auto_runtime_sanity
-          # - name: custom_runtime_sanity
+          - name: custom_runtime_sanity
           # - name: host_runtime_sanity
           # - name: hybrid_runtime_sanity
       execution:
@@ -16,8 +16,8 @@ pipelines:
           - write_output auto_runtime_sanity "triggerRunId=${run_id}"
           - write_output auto_runtime_sanity "qualityGateStep=auto_runtime_sanity_gate"
 
-          # - write_output custom_runtime_sanity "triggerRunId=${run_id}"
-          # - write_output custom_runtime_sanity "qualityGateStep=custom_runtime_sanity_gate"
+          - write_output custom_runtime_sanity "triggerRunId=${run_id}"
+          - write_output custom_runtime_sanity "qualityGateStep=custom_runtime_sanity_gate"
 
           # - write_output host_runtime_sanity "triggerRunId=${run_id}"
           # - write_output host_runtime_sanity "qualityGateStep=host_runtime_sanity_gate"
@@ -36,15 +36,15 @@ pipelines:
         onExecute:
           - echo "auto_runtime_sanity_gate done"
 
-    # - name: custom_runtime_sanity_gate
-    #   type: Bash
-    #   configuration:
-    #     requiresApproval: true
-    #     inputResources:
-    #       - name: custom_runtime_sanity
-    #   execution:
-    #     onExecute:
-    #       - echo "custom_runtime_sanity_gate done"
+    - name: custom_runtime_sanity_gate
+      type: Bash
+      configuration:
+        requiresApproval: true
+        inputResources:
+          - name: custom_runtime_sanity
+      execution:
+        onExecute:
+          - echo "custom_runtime_sanity_gate done"
 
     # - name: host_runtime_sanity
     #   type: Bash
@@ -72,7 +72,7 @@ pipelines:
         inputSteps:
           - name: auto_runtime_sanity_gate
           # - name: host_runtime_sanity_gate
-          # - name: custom_runtime_sanity_gate
+          - name: custom_runtime_sanity_gate
           # - name: hybrid_runtime_sanity_gate
         inputResources:
           - name: this_repo
