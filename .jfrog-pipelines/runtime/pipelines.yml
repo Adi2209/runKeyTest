@@ -7,13 +7,13 @@ pipelines:
         inputResources:
           - name: runtime_sanity
         outputResources:
-          - name: auto_runtime_sanity
+          - name: runtime_auto_sanity
           - name: custom_runtime_sanity
           - name: hybrid_runtime_sanity
       execution:
         onStart: 
-          - write_output auto_runtime_sanity "triggerRunId=${run_id}"
-          - write_output auto_runtime_sanity "qualityGateStep=auto_runtime_sanity_gate"
+          - write_output runtime_auto_sanity "triggerRunId=${run_id}"
+          - write_output runtime_auto_sanity "qualityGateStep=auto_runtime_sanity_gate"
 
           - write_output custom_runtime_sanity "triggerRunId=${run_id}"
           - write_output custom_runtime_sanity "qualityGateStep=custom_runtime_sanity_gate"
@@ -27,7 +27,7 @@ pipelines:
       configuration:
         requiresApproval: true
         inputResources:
-          - name: auto_runtime_sanity
+          - name: runtime_auto_sanity
       execution:
         onExecute:
           - echo "auto_runtime_sanity_gate done"
