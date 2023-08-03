@@ -127,6 +127,7 @@ pipelines:
         execution:
           onExecute:
             - pushd ${res_this_repo_resourcePath}/scripts
+            - pwd
             - npm ci
             - export API_URL="${int_sanity_platform_url}/pipelines/api/v1"
             - export API_TOKEN="Bearer ${int_sanity_platform_accessToken}"
