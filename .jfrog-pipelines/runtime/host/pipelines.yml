@@ -95,8 +95,6 @@ pipelines:
       - name: step_r_h_s7
         type: Bash
         configuration: 
-          inputResources:
-            - name: mySecondRepo
           inputSteps: 
             - name: step_r_h_s3
             - name: step_r_h_s5
