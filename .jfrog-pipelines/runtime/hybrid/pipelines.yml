@@ -28,15 +28,15 @@ resources:
 
 pipelines:
   - name: pipeline_runtime_hybrid_sanity_adityan
-    configuration:
-      runtime: 
-        type: image
-        image: 
-          custom:
-            name: jfpip.jfrog.io/jfrog/pipelines-tools
-            tag: latest
-            registry: aditya_ent
-            sourceRepository: dev-releases-docker-local
+    # configuration:
+      # runtime: 
+      #   type: image
+      #   image: 
+      #     custom:
+      #       name: jfpip.jfrog.io/jfrog/pipelines-tools
+      #       tag: latest
+      #       registry: aditya_ent
+      #       sourceRepository: dev-releases-docker-local
     steps: #step_r_hyb definiton
       - name: step_r_hyb_s1
         type: Bash
