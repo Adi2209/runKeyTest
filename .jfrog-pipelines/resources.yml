@@ -6,7 +6,7 @@ resources:
   - name: this_repo
     type: GitRepo
     configuration:
-      gitProvider: nawaz_bbs
-      path: ~KHAZINA/testing
+      gitProvider: int1  
+      path: adi2209/runKeyTest
       files:
         include: \scripts\/.+\b
