@@ -6,7 +6,7 @@ resources:
   - name: this_repo
     type: GitRepo
     configuration:
-      gitProvider: int1
+      gitProvider: int1  
       path: adi2209/runKeyTest
       files:
-        include: \scripts\/.+\bx
+        include: \scripts\/.+\b
