@@ -9,6 +9,7 @@ approvalGateCommand
   .requiredOption('--runId [integer]', 'Approval gate runId')
   .action(async (values) => {
     const adapter = new PipelinesAdapter('pipelinesTesting', values.apiUrl, values.token);
+    console.log(values.runId, values.stepName);
     const gate = new Gate(values.runId, values.stepName, values.comment || 'no comment', adapter);
     try {
       if (values.approved === true) {
